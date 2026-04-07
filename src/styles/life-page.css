@@ -1,0 +1,106 @@
+/* ── Life (draggable canvas) ─────────────────────────── */
+
+.life-page {
+  position: relative;
+  width: 100dvw;
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.life-page__canvas {
+  position: absolute;
+  inset: 0;
+  padding: clamp(1rem, 4vw, 2.5rem);
+}
+
+.life-page__title-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.life-page__title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  text-align: center;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  max-width: min(90vw, 28ch);
+}
+
+.life-page__title strong {
+  display: inline;
+  color: var(--color-text);
+  font-weight: var(--weight-bold);
+}
+
+.life-page__hint {
+  position: absolute;
+  bottom: clamp(1rem, 3vw, 1.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.life-polaroid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-3);
+  border-radius: 2px;
+}
+
+.life-polaroid__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1px;
+}
+
+.life-polaroid__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.life-note {
+  max-width: min(280px, 72vw);
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-sans);
+}
+
+.life-note__label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+}
+
+.life-note__body {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  user-select: text;
+}
