@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useIntroState } from '@/features/intro/useIntroState'
 
 const navLinks = [
   { label: 'work', to: '/#work' },
@@ -8,18 +9,20 @@ const navLinks = [
 ]
 
 export function Navbar() {
+  const { introHandoffStarted, introComplete } = useIntroState()
+  const isIntroPending = !introHandoffStarted && !introComplete
+
   return (
-    <header className="navbar">
-      <Link to="/" className="navbar__logo navbar__logo--anim">
+    <header className={`navbar${isIntroPending ? ' navbar--intro-pending' : ''}`}>
+      <Link to="/" className="navbar__logo">
         Nischal Skanda
       </Link>
       <nav className="navbar__nav">
-        {navLinks.map((link, i) => (
+        {navLinks.map((link) => (
           <Link
             key={link.label}
             to={link.to}
             className="navbar__link"
-            style={{ animationDelay: `${0.1 + i * 0.08}s` }}
           >
             {link.label}
           </Link>

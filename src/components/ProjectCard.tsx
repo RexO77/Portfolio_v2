@@ -2,10 +2,12 @@ import {
   useCallback,
   useEffect,
   useId,
+  useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
 } from 'react'
 import { Link } from 'react-router-dom'
+import { useStartupAsset } from '@/features/intro/useStartupAsset'
 
 function useFinePointer() {
   const [fine, setFine] = useState(false)
@@ -33,6 +35,7 @@ interface ProjectCardProps {
   /** Short line on the desktop cursor chip; defaults to description */
   hoverSummary?: string
   to?: string
+  trackIntroLoad?: boolean
 }
 
 export function ProjectCard({
@@ -46,12 +49,16 @@ export function ProjectCard({
   tags,
   hoverSummary,
   to,
+  trackIntroLoad = false,
 }: ProjectCardProps) {
   const panelId = useId()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [chipPos, setChipPos] = useState({ x: 0, y: 0 })
   const [chipVisible, setChipVisible] = useState(false)
   const finePointer = useFinePointer()
+  const imageRef = useRef<HTMLImageElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const settleStartupAsset = useStartupAsset(trackIntroLoad && Boolean(videoSrc || imageSrc))
 
   const chipText = hoverSummary ?? description
 
@@ -66,6 +73,21 @@ export function ProjectCard({
   const onMediaLeave = useCallback(() => {
     setChipVisible(false)
   }, [])
+
+  useEffect(() => {
+    if (!trackIntroLoad) {
+      return
+    }
+
+    if (imageRef.current?.complete) {
+      settleStartupAsset()
+      return
+    }
+
+    if ((videoRef.current?.readyState ?? 0) >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      settleStartupAsset()
+    }
+  }, [imageSrc, settleStartupAsset, trackIntroLoad, videoSrc])
 
   const meta =
     role || timeline ? (
@@ -127,22 +149,30 @@ export function ProjectCard({
 
   const media = videoSrc ? (
     <video
+      ref={videoRef}
       autoPlay
       loop
       muted
       playsInline
       poster={imageSrc}
       className="project-card__video"
+      preload={trackIntroLoad ? 'auto' : 'metadata'}
+      onLoadedData={settleStartupAsset}
+      onError={settleStartupAsset}
     >
       <source src={videoSrc} />
     </video>
   ) : imageSrc ? (
     <img
+      ref={imageRef}
       src={imageSrc}
       alt={title}
       className="project-card__image"
-      loading="lazy"
+      loading={trackIntroLoad ? 'eager' : 'lazy'}
       decoding="async"
+      fetchPriority={trackIntroLoad ? 'high' : 'auto'}
+      onLoad={settleStartupAsset}
+      onError={settleStartupAsset}
     />
   ) : (
     <div className="project-card__placeholder" aria-hidden />

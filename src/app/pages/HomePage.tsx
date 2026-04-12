@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { FloatingBadge } from '@/components/FloatingBadge'
 import { ProjectCard } from '@/components/ProjectCard'
+import { useIntroState } from '@/features/intro/useIntroState'
+import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 
 const CHAR_STAGGER = 0.022
-const BASE_DELAY = 0.2
+const BASE_DELAY = 0.08
 
 const TEXT_LINES = [
   'Curious Designer ',
@@ -17,12 +19,20 @@ const ENTRANCE_DURATION = (BASE_DELAY + totalChars * CHAR_STAGGER) * 1000 + 450
 export const BADGE_DELAY = BASE_DELAY + (totalChars * CHAR_STAGGER) + 0.15
 
 export default function HomePage() {
+  const { introHandoffStarted, introComplete } = useIntroState()
   const [ready, setReady] = useState(false)
+  const heroRevealStarted = introHandoffStarted || introComplete
+
+  useStartupRouteReady()
 
   useEffect(() => {
+    if (!heroRevealStarted) {
+      return undefined
+    }
+
     const id = setTimeout(() => setReady(true), ENTRANCE_DURATION)
     return () => clearTimeout(id)
-  }, [])
+  }, [heroRevealStarted])
 
   return (
     <main className="homepage">
@@ -38,9 +48,11 @@ export default function HomePage() {
       <section className="hero">
         <div className="hero__text-wrapper">
           <h1 className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}>
-            <HeroTextCSS />
+            <HeroTextCSS animate={heroRevealStarted} />
           </h1>
-          <FloatingBadge label="PRODUCT" delay={BADGE_DELAY} />
+          {heroRevealStarted ? (
+            <FloatingBadge label="PRODUCT" delay={BADGE_DELAY} />
+          ) : null}
         </div>
       </section>
 
@@ -55,13 +67,14 @@ export default function HomePage() {
           timeline="8 weeks"
           tags={['Product Design', 'Systems Thinking', 'Enterprise']}
           to="/projects/question-library"
+          trackIntroLoad
         />
       </div>
     </main>
   )
 }
 
-function HeroTextCSS() {
+function HeroTextCSS({ animate }: { animate: boolean }) {
   let charIndex = 0
 
   return (
@@ -74,8 +87,8 @@ function HeroTextCSS() {
             return (
               <span
                 key={charIndex}
-                className="hero__char"
-                style={{ animationDelay: `${delay}s` }}
+                className={`hero__char${animate ? ' hero__char--armed' : ''}`}
+                style={animate ? { animationDelay: `${delay}s` } : undefined}
               >
                 {char}
               </span>
