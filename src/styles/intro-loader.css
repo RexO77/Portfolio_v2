@@ -1,0 +1,85 @@
+.intro-loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: var(--color-bg);
+  z-index: var(--z-modal);
+}
+
+.intro-loader--exiting {
+  pointer-events: none;
+}
+
+.intro-loader__stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.intro-loader__greeting {
+  grid-area: 1 / 1;
+  width: 100%;
+  padding-inline: 24px;
+  font-size: clamp(54px, 10vw, 120px);
+  font-weight: var(--weight-medium);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+  text-align: center;
+  text-wrap: balance;
+  will-change: opacity;
+}
+
+.intro-loader__greeting[data-script='latin'] {
+  font-family: var(--font-intro-latin);
+}
+
+.intro-loader__greeting[data-script='devanagari'] {
+  font-family: var(--font-intro-devanagari);
+}
+
+.intro-loader__greeting[data-script='bengali'] {
+  font-family: var(--font-intro-bengali);
+}
+
+.intro-loader__greeting[data-script='telugu'] {
+  font-family: var(--font-intro-telugu);
+}
+
+.intro-loader__greeting[data-script='tamil'] {
+  font-family: var(--font-intro-tamil);
+}
+
+.intro-loader__greeting[data-script='arabic'] {
+  font-family: var(--font-intro-arabic);
+}
+
+.intro-loader__greeting[data-script='gujarati'] {
+  font-family: var(--font-intro-gujarati);
+}
+
+.intro-loader__greeting[data-script='kannada'] {
+  font-family: var(--font-intro-kannada);
+}
+
+.intro-loader__greeting[data-script='malayalam'] {
+  font-family: var(--font-intro-malayalam);
+}
+
+.intro-loader__greeting[data-script='gurmukhi'] {
+  font-family: var(--font-intro-gurmukhi);
+}
+
+.intro-loader__greeting[data-script='oriya'] {
+  font-family: var(--font-intro-oriya);
+}
+
+@media (max-width: 640px) {
+  .intro-loader__greeting {
+    padding-inline: 20px;
+  }
+}

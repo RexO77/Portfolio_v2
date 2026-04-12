@@ -22,6 +22,17 @@
   --font-serif: 'Instrument Serif', Georgia, serif;
   --font-sans: 'Inclusive Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  --font-intro-latin: 'Inclusive Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-intro-devanagari: 'Noto Sans Devanagari', var(--font-intro-latin);
+  --font-intro-bengali: 'Noto Sans Bengali', var(--font-intro-latin);
+  --font-intro-telugu: 'Noto Sans Telugu', var(--font-intro-latin);
+  --font-intro-tamil: 'Noto Sans Tamil', var(--font-intro-latin);
+  --font-intro-arabic: 'Noto Sans Arabic', var(--font-intro-latin);
+  --font-intro-gujarati: 'Noto Sans Gujarati', var(--font-intro-latin);
+  --font-intro-kannada: 'Noto Sans Kannada', var(--font-intro-latin);
+  --font-intro-malayalam: 'Noto Sans Malayalam', var(--font-intro-latin);
+  --font-intro-gurmukhi: 'Noto Sans Gurmukhi', var(--font-intro-latin);
+  --font-intro-oriya: 'Noto Sans Oriya', var(--font-intro-latin);
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;

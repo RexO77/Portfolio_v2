@@ -4,6 +4,7 @@ import { motion, useInView } from 'motion/react'
 import { Navbar } from '@/components/Navbar'
 import { ArrowLeft } from '@/components/icons/ArrowLeft'
 import NumberTicker from '@/components/fancy/NumberTicker'
+import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 import '@/styles/case-study.css'
 
 const imgHero =
@@ -93,6 +94,8 @@ export default function QuestionLibraryCaseStudy() {
   const [password, setPassword] = useState('')
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [isWrong, setIsWrong] = useState(false)
+
+  useStartupRouteReady()
 
   const handleUnlock = () => {
     if (password.toLowerCase() === 'talview') {

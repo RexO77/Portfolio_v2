@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import { Navbar } from '@/components/Navbar'
 import DragElements from '@/components/fancy/blocks/drag-elements'
+import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 import useScreenSize from '@/hooks/use-screen-size'
 import '@/styles/life-page.css'
 
@@ -64,6 +65,8 @@ const NOTE_BLOCKS: {
 export default function LifePage() {
   const screenSize = useScreenSize()
   const compact = screenSize.lessThan('md')
+
+  useStartupRouteReady()
 
   const polaroids = useMemo(
     () =>
