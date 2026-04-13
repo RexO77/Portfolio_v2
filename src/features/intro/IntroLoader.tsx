@@ -72,6 +72,10 @@ export function IntroLoader({
         ease: [0.23, 1, 0.32, 1],
       }}
     >
+      <p className="sr-only" aria-live="polite">
+        Opening portfolio introduction.
+      </p>
+
       <div className="intro-loader__stage" aria-hidden="true">
         <AnimatePresence initial={false} mode="sync">
           <motion.p
@@ -90,10 +94,6 @@ export function IntroLoader({
             {activeGreeting.greeting}
           </motion.p>
         </AnimatePresence>
-
-        <p className="sr-only" aria-live="polite">
-          Opening portfolio introduction.
-        </p>
       </div>
     </motion.div>
   )

@@ -13,7 +13,10 @@ export function Navbar() {
   const isIntroPending = !introHandoffStarted && !introComplete
 
   return (
-    <header className={`navbar${isIntroPending ? ' navbar--intro-pending' : ''}`}>
+    <header
+      className={`navbar${isIntroPending ? ' navbar--intro-pending' : ''}`}
+      aria-hidden={isIntroPending}
+    >
       <Link to="/" className="navbar__logo">
         Nischal Skanda
       </Link>

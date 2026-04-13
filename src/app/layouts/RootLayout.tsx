@@ -47,7 +47,7 @@ export function RootLayout() {
     frame = window.requestAnimationFrame(syncScrollPosition)
 
     return () => window.cancelAnimationFrame(frame)
-  }, [isIntroActive, location.hash, location.pathname, outlet, shouldReduceMotion])
+  }, [isIntroActive, location.hash, location.pathname, shouldReduceMotion])
 
   return (
     <div

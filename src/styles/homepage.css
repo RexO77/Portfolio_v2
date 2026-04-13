@@ -96,6 +96,7 @@
 .navbar--intro-pending {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .navbar__logo {
