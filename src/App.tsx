@@ -7,7 +7,9 @@ import { type IntroState } from '@/features/intro/intro-state'
 const INTRO_MIN_DURATION_MS = 3400
 
 export default function App() {
-  const [isIntroActive, setIsIntroActive] = useState(() => typeof window !== 'undefined')
+  const [isIntroActive, setIsIntroActive] = useState(
+    () => typeof window !== 'undefined',
+  )
   const [introHandoffStarted, setIntroHandoffStarted] = useState(
     () => typeof window === 'undefined',
   )
@@ -73,7 +75,11 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (fontsReady || typeof document === 'undefined' || !('fonts' in document)) {
+    if (
+      fontsReady ||
+      typeof document === 'undefined' ||
+      !('fonts' in document)
+    ) {
       return undefined
     }
 
@@ -91,30 +97,23 @@ export default function App() {
   }, [fontsReady])
 
   const introComplete = !isIntroActive
-  const canExitIntro =
-    minimumElapsed &&
-    startupRouteReady &&
-    fontsReady &&
-    pendingStartupAssets.size === 0
+  const canExitIntro = minimumElapsed && startupRouteReady && fontsReady && pendingStartupAssets.size === 0
 
-  const introState = useMemo<IntroState>(
-    () => ({
-      isIntroActive,
-      introHandoffStarted,
-      introComplete,
-      markStartupRouteReady,
-      registerStartupAsset,
-      resolveStartupAsset,
-    }),
-    [
-      introHandoffStarted,
-      introComplete,
-      isIntroActive,
-      markStartupRouteReady,
-      registerStartupAsset,
-      resolveStartupAsset,
-    ],
-  )
+  const introState = useMemo<IntroState>(() => ({
+    isIntroActive,
+    introHandoffStarted,
+    introComplete,
+    markStartupRouteReady,
+    registerStartupAsset,
+    resolveStartupAsset,
+  }), [
+    introHandoffStarted,
+    introComplete,
+    isIntroActive,
+    markStartupRouteReady,
+    registerStartupAsset,
+    resolveStartupAsset,
+  ])
 
   return (
     <IntroStateProvider value={introState}>

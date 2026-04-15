@@ -2,26 +2,15 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import { useStartupAsset } from '@/features/intro/useStartupAsset'
-
-function useFinePointer() {
-  const [fine, setFine] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
-    const apply = () => setFine(mq.matches)
-    apply()
-    mq.addEventListener('change', apply)
-    return () => mq.removeEventListener('change', apply)
-  }, [])
-
-  return fine
-}
 
 interface ProjectCardProps {
   videoSrc?: string
@@ -35,6 +24,8 @@ interface ProjectCardProps {
   /** Short line on the desktop cursor chip; defaults to description */
   hoverSummary?: string
   to?: string
+  ctaLabel?: string
+  mobileCtaLabel?: string
   trackIntroLoad?: boolean
 }
 
@@ -49,29 +40,85 @@ export function ProjectCard({
   tags,
   hoverSummary,
   to,
+  ctaLabel = 'Read case study',
+  mobileCtaLabel = 'Open full case study',
   trackIntroLoad = false,
 }: ProjectCardProps) {
   const panelId = useId()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [chipPos, setChipPos] = useState({ x: 0, y: 0 })
   const [chipVisible, setChipVisible] = useState(false)
-  const finePointer = useFinePointer()
+  const finePointer = useMediaQuery('(hover: hover) and (pointer: fine)')
+  const chipRef = useRef<HTMLSpanElement>(null)
+  const rafRef = useRef<number | null>(null)
+  const lastPointerRef = useRef({ x: 0, y: 0 })
   const imageRef = useRef<HTMLImageElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const settleStartupAsset = useStartupAsset(trackIntroLoad && Boolean(videoSrc || imageSrc))
 
   const chipText = hoverSummary ?? description
 
-  const onMediaMove = useCallback((e: ReactMouseEvent) => {
-    setChipPos({ x: e.clientX, y: e.clientY })
+  const updateChipPosition = useCallback(() => {
+    rafRef.current = null
+
+    const chip = chipRef.current
+    if (!chip) return
+
+    const { x, y } = lastPointerRef.current
+    const chipRect = chip.getBoundingClientRect()
+    const gap = 6
+    const viewportPadding = 12
+
+    let left = x + gap
+    if (left + chipRect.width > window.innerWidth - viewportPadding) {
+      left = x - chipRect.width - gap
+    }
+    left = Math.max(viewportPadding, left)
+
+    let top = y + gap
+    if (top + chipRect.height > window.innerHeight - viewportPadding) {
+      top = y - chipRect.height - gap
+    }
+    top = Math.max(
+      viewportPadding,
+      Math.min(top, window.innerHeight - chipRect.height - viewportPadding),
+    )
+
+    chip.style.left = `${left}px`
+    chip.style.top = `${top}px`
   }, [])
 
-  const onMediaEnter = useCallback(() => {
-    if (finePointer) setChipVisible(true)
-  }, [finePointer])
+  const queueChipPosition = useCallback((x: number, y: number) => {
+    lastPointerRef.current = { x, y }
+
+    if (rafRef.current !== null) return
+    rafRef.current = window.requestAnimationFrame(updateChipPosition)
+  }, [updateChipPosition])
+
+  const onMediaMove = useCallback((e: ReactMouseEvent) => {
+    queueChipPosition(e.clientX, e.clientY)
+  }, [queueChipPosition])
+
+  const onMediaEnter = useCallback((e: ReactMouseEvent) => {
+    if (!finePointer) return
+    queueChipPosition(e.clientX, e.clientY)
+    setChipVisible(true)
+  }, [finePointer, queueChipPosition])
 
   const onMediaLeave = useCallback(() => {
     setChipVisible(false)
+  }, [])
+
+  useLayoutEffect(() => {
+    if (!chipVisible) return
+    updateChipPosition()
+  }, [chipText, chipVisible, updateChipPosition])
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current)
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -129,7 +176,7 @@ export function ProjectCard({
 
   const ctaRow = (
     <span className="project-card__cta">
-      Read case study
+      {ctaLabel}
       <svg
         width="14"
         height="14"
@@ -215,17 +262,20 @@ export function ProjectCard({
             </div>
           </div>
         </div>
-
-        {finePointer && chipVisible && (
-          <span
-            className="project-card__cursor-chip"
-            style={{ left: chipPos.x, top: chipPos.y }}
-            aria-hidden
-          >
-            {chipText}
-          </span>
-        )}
       </Link>
+
+      {finePointer && chipVisible && typeof document !== 'undefined'
+        ? createPortal(
+            <span
+              ref={chipRef}
+              className="project-card__cursor-chip"
+              aria-hidden
+            >
+              {chipText}
+            </span>,
+            document.body,
+          )
+        : null}
 
       <div className="project-card__mobile">
         <button
@@ -248,7 +298,7 @@ export function ProjectCard({
         >
           <div className="project-card__details-inner">{detailBody}</div>
           <Link to={to} className="project-card__mobile-cta">
-            Open full case study
+            {mobileCtaLabel}
           </Link>
         </div>
       </div>

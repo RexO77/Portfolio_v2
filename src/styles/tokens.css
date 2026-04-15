@@ -1,4 +1,10 @@
 :root {
+  --d-bg: 0 0% 100%;
+  --d-muted: 0 0% 90%;
+  --d-fg: 0 0% 0%;
+  --d-border: 0 0% 90%;
+  --d-sheet: 0 0% 98%;
+
   /* ── Colors ─────────────────────────────────────────── */
   --color-bg: #f8ecc8;
   --color-surface: #f0e4bc;
@@ -17,6 +23,27 @@
   --color-yellow: #f8ff70;
   --color-blue: #55a0fb;
   --color-pink: #fb55e5;
+
+  /* ── Semantic theme tokens (shadcn/Tailwind) ───────── */
+  --background: #f8ecc8;
+  --foreground: #1e1e1e;
+  --card: #fff8e8;
+  --card-foreground: #1e1e1e;
+  --popover: #fff8e8;
+  --popover-foreground: #1e1e1e;
+  --primary: #1e1e1e;
+  --primary-foreground: #f8ecc8;
+  --secondary: #f0e4bc;
+  --secondary-foreground: #1e1e1e;
+  --muted: #f0e4bc;
+  --muted-foreground: #444444;
+  --accent: #fff3cf;
+  --accent-foreground: #1e1e1e;
+  --destructive: #c74c4c;
+  --border: #e0d4a8;
+  --input: #ebe0b8;
+  --ring: #1e1e1e;
+  --radius: 1rem;
 
   /* ── Typography ─────────────────────────────────────── */
   --font-serif: 'Instrument Serif', Georgia, serif;

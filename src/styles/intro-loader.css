@@ -12,10 +12,10 @@
 }
 
 .intro-loader__stage {
-  position: absolute;
-  inset: 0;
   display: grid;
   place-items: center;
+  position: absolute;
+  inset: 0;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
 }
@@ -23,7 +23,6 @@
 .intro-loader__greeting {
   grid-area: 1 / 1;
   width: 100%;
-  padding-inline: 24px;
   font-size: clamp(54px, 10vw, 120px);
   font-weight: var(--weight-medium);
   line-height: 1.08;
@@ -31,6 +30,7 @@
   color: var(--color-text);
   text-align: center;
   text-wrap: balance;
+  padding-inline: 24px;
   will-change: opacity;
 }
 

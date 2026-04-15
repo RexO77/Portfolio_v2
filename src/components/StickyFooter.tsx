@@ -1,4 +1,5 @@
-import { navItems, socialLinks, siteMetadata } from '@/content/site'
+import { Link } from 'react-router-dom'
+import { footerNavItems, socialLinks, siteMetadata } from '@/content/site'
 
 export function StickyFooter() {
   const firstName = siteMetadata.name.split(' ')[0]
@@ -8,11 +9,11 @@ export function StickyFooter() {
       <div className="sticky-footer__inner">
         <nav className="sticky-footer__links" aria-label="Footer navigation">
           <ul>
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <a href={item.href} className="sticky-footer__link">
+            {footerNavItems.map((item) => (
+              <li key={item.to}>
+                <Link to={item.to} className="sticky-footer__link">
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -22,8 +23,8 @@ export function StickyFooter() {
                 <a
                   href={link.url}
                   className="sticky-footer__link"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={link.url.startsWith('http') ? '_blank' : undefined}
+                  rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
                 >
                   {link.label}
                 </a>

@@ -2,6 +2,11 @@ import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useLocation, useOutlet } from 'react-router-dom'
 import { useIntroState } from '@/features/intro/useIntroState'
+import {
+  pageShellEnter,
+  pageShellExit,
+  pageShellTransition,
+} from '@/lib/motion'
 
 export function RootLayout() {
   const location = useLocation()
@@ -58,14 +63,10 @@ export function RootLayout() {
         <motion.div
           key={location.pathname}
           className="route-shell"
-          initial={shouldAnimateRouteShell ? { opacity: 0, y: 12 } : false}
+          initial={shouldAnimateRouteShell ? pageShellEnter : false}
           animate={{ opacity: 1, y: 0 }}
-          exit={shouldAnimateRouteShell ? { opacity: 0, y: -12 } : { opacity: 1, y: 0 }}
-          transition={
-            shouldAnimateRouteShell
-              ? { duration: 0.28, ease: [0.23, 1, 0.32, 1] }
-              : { duration: 0 }
-          }
+          exit={shouldAnimateRouteShell ? pageShellExit : { opacity: 1, y: 0 }}
+          transition={shouldAnimateRouteShell ? pageShellTransition : { duration: 0 }}
         >
           {outlet}
         </motion.div>

@@ -13,11 +13,7 @@ const REDUCED_MOTION_STEP_MS = 220
 const STANDARD_EXIT_MS = 420
 const REDUCED_MOTION_EXIT_MS = 280
 
-export function IntroLoader({
-  canExit,
-  onExitStart,
-  onComplete,
-}: IntroLoaderProps) {
+export function IntroLoader({ canExit, onExitStart, onComplete }: IntroLoaderProps) {
   const prefersReducedMotion = useReducedMotion()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [sequenceComplete, setSequenceComplete] = useState(false)
@@ -72,10 +68,6 @@ export function IntroLoader({
         ease: [0.23, 1, 0.32, 1],
       }}
     >
-      <p className="sr-only" aria-live="polite">
-        Opening portfolio introduction.
-      </p>
-
       <div className="intro-loader__stage" aria-hidden="true">
         <AnimatePresence initial={false} mode="sync">
           <motion.p
@@ -94,6 +86,10 @@ export function IntroLoader({
             {activeGreeting.greeting}
           </motion.p>
         </AnimatePresence>
+
+        <p className="sr-only" aria-live="polite">
+          Opening portfolio introduction.
+        </p>
       </div>
     </motion.div>
   )

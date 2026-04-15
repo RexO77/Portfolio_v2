@@ -1,4 +1,4 @@
-import { useCallback, useId, useLayoutEffect, useRef } from 'react'
+import { useCallback, useLayoutEffect, useId, useRef } from 'react'
 import { useIntroState } from './useIntroState'
 
 export function useStartupAsset(enabled: boolean) {
