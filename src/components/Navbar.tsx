@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { DiscoverNav } from '@/components/ui/discover-nav'
@@ -8,21 +8,22 @@ import {
   CloseIcon,
   ExternalLink,
   FileText,
-  Github,
-  Linkedin,
+  GitHub,
+  LinkedIn,
   Mail,
   MenuIcon,
   Twitter,
 } from '@/components/icons'
 import { connectEmail, connectLinks, navItems } from '@/content/site'
 import { useIntroState } from '@/features/intro/useIntroState'
+import { useCopyText } from '@/hooks/use-copy-text'
 import { cn } from '@/lib/utils'
 
 const MOBILE_SOCIAL_ICONS: Record<string, React.ReactNode> = {
   email: <Mail className="h-4 w-4" />,
   twitter: <Twitter className="h-4 w-4" />,
-  github: <Github className="h-4 w-4" />,
-  linkedin: <Linkedin className="h-4 w-4" />,
+  github: <GitHub className="h-4 w-4" />,
+  linkedin: <LinkedIn className="h-4 w-4" />,
   resume: <FileText className="h-4 w-4" />,
 }
 
@@ -53,8 +54,7 @@ function NavbarContent() {
   const activeItem = getActiveNavTarget(location.pathname, location.hash)
 
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const [emailCopied, setEmailCopied] = useState(false)
-  const copyResetTimeoutRef = useRef<number | null>(null)
+  const { copied: emailCopied, copy: copyEmail } = useCopyText(connectEmail)
 
   const scrollToHash = useCallback(
     (hash: string) => {
@@ -103,41 +103,6 @@ function NavbarContent() {
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isMobileOpen])
-
-  useEffect(() => {
-    return () => {
-      if (copyResetTimeoutRef.current !== null) {
-        window.clearTimeout(copyResetTimeoutRef.current)
-      }
-    }
-  }, [])
-
-  const handleCopyEmail = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(connectEmail)
-    } catch {
-      const textArea = document.createElement('textarea')
-      textArea.value = connectEmail
-      document.body.appendChild(textArea)
-      textArea.select()
-      try {
-        document.execCommand('copy')
-      } catch {
-        // ignore
-      }
-      document.body.removeChild(textArea)
-    }
-
-    if (copyResetTimeoutRef.current !== null) {
-      window.clearTimeout(copyResetTimeoutRef.current)
-    }
-
-    setEmailCopied(true)
-    copyResetTimeoutRef.current = window.setTimeout(() => {
-      copyResetTimeoutRef.current = null
-      setEmailCopied(false)
-    }, 2000)
-  }, [])
 
   const handleSkipToContent = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -239,7 +204,9 @@ function NavbarContent() {
                     'navbar__mobile-email',
                     emailCopied && 'navbar__mobile-email--copied',
                   )}
-                  onClick={handleCopyEmail}
+                  onClick={() => {
+                    void copyEmail()
+                  }}
                 >
                   {emailCopied ? (
                     <>

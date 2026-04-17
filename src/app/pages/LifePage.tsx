@@ -91,11 +91,11 @@ export default function LifePage() {
 
         <section id="life-essay" className="life-essay" aria-labelledby="life-essay-title">
           <header className="life-essay__intro">
+            <p className="life-essay__eyebrow">{essay.eyebrow}</p>
             <h1 id="life-essay-title" className="life-essay__title">
-              {essay.titleLines.map((line, index) => (
+              {essay.titleLines.map((line) => (
                 <span key={line} className="life-essay__title-line">
                   {line}
-                  {index < essay.titleLines.length - 1 ? <br /> : null}
                 </span>
               ))}
             </h1>

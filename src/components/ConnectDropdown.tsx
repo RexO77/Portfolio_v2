@@ -14,12 +14,13 @@ import {
   Copy,
   ExternalLink,
   FileText,
-  Github,
-  Linkedin,
+  GitHub,
+  LinkedIn,
   Mail,
   Twitter,
 } from '@/components/icons'
 import { connectEmail, connectLinks, type ConnectLink } from '@/content/site'
+import { useCopyText } from '@/hooks/use-copy-text'
 import { cn } from '@/lib/utils'
 
 interface ConnectDropdownProps {
@@ -29,20 +30,20 @@ interface ConnectDropdownProps {
 const ICONS: Record<string, ReactNode> = {
   email: <Mail className="h-4 w-4" />,
   twitter: <Twitter className="h-4 w-4" />,
-  github: <Github className="h-4 w-4" />,
-  linkedin: <Linkedin className="h-4 w-4" />,
+  github: <GitHub className="h-4 w-4" />,
+  linkedin: <LinkedIn className="h-4 w-4" />,
   resume: <FileText className="h-4 w-4" />,
 }
 
 export function ConnectDropdown({ className }: ConnectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [emailCopied, setEmailCopied] = useState(false)
   const shouldReduceMotion = useReducedMotion()
   const menuId = useId()
+  const triggerId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const closeTimeoutRef = useRef<number | null>(null)
-  const copyResetTimeoutRef = useRef<number | null>(null)
+  const { copied: emailCopied, copy: copyEmail, resetCopied } = useCopyText(connectEmail)
 
   const clearTimeoutRef = (timeoutRef: MutableRefObject<number | null>) => {
     if (timeoutRef.current === null) {
@@ -54,9 +55,8 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
   }
 
   const resetCopyState = useCallback(() => {
-    clearTimeoutRef(copyResetTimeoutRef)
-    setEmailCopied(false)
-  }, [])
+    resetCopied()
+  }, [resetCopied])
 
   const closeMenu = useCallback(() => {
     clearTimeoutRef(closeTimeoutRef)
@@ -65,38 +65,10 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
     triggerRef.current?.focus()
   }, [resetCopyState])
 
-  const showCopySuccess = useCallback(() => {
-    setEmailCopied(true)
-    clearTimeoutRef(copyResetTimeoutRef)
-    copyResetTimeoutRef.current = window.setTimeout(() => {
-      copyResetTimeoutRef.current = null
-      setEmailCopied(false)
-    }, 2000)
-  }, [])
-
-  const handleCopyEmail = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(connectEmail)
-      showCopySuccess()
-    } catch {
-      const textArea = document.createElement('textarea')
-      textArea.value = connectEmail
-      document.body.appendChild(textArea)
-      textArea.select()
-      try {
-        document.execCommand('copy')
-      } catch {
-        // ignore
-      }
-      document.body.removeChild(textArea)
-      showCopySuccess()
-    }
-  }, [showCopySuccess])
-
   const handleOptionClick = useCallback(
     (option: ConnectLink) => {
       if (option.kind === 'copy-email') {
-        void handleCopyEmail()
+        void copyEmail()
         clearTimeoutRef(closeTimeoutRef)
         closeTimeoutRef.current = window.setTimeout(() => {
           closeTimeoutRef.current = null
@@ -106,7 +78,7 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
       }
       closeMenu()
     },
-    [closeMenu, handleCopyEmail],
+    [closeMenu, copyEmail],
   )
 
   useEffect(() => {
@@ -137,7 +109,6 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
   useEffect(() => {
     return () => {
       clearTimeoutRef(closeTimeoutRef)
-      clearTimeoutRef(copyResetTimeoutRef)
     }
   }, [])
 
@@ -180,8 +151,8 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
           setIsOpen(true)
         }}
         aria-expanded={isOpen}
-        aria-haspopup="menu"
         aria-controls={menuId}
+        id={triggerId}
       >
         <span className="navbar__connect-label">{"Let's chat"}</span>
         <motion.span
@@ -198,8 +169,7 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
         {isOpen && (
           <motion.div
             id={menuId}
-            role="menu"
-            aria-label="Let's chat"
+            aria-labelledby={triggerId}
             className="navbar__connect-menu"
             initial={{ opacity: 0, y: -8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -223,7 +193,6 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
                     >
                       <button
                         type="button"
-                        role="menuitem"
                         className={cn(
                           'navbar__connect-item',
                           showCopied && 'navbar__connect-item--copied',
@@ -255,7 +224,6 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
                     transition={itemTransition(index)}
                   >
                     <a
-                      role="menuitem"
                       href={option.href}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -267,7 +235,7 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
                         {option.active && (
                           <span
                             className="navbar__connect-icon-dot"
-                            aria-label="Active"
+                            aria-hidden
                           />
                         )}
                       </span>

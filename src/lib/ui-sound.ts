@@ -65,13 +65,13 @@ const VALID_UI_SOUND_CUES = new Set<UISoundCue>([...PLAYABLE_UI_SOUND_CUES, 'off
 const isBrowser = typeof window !== 'undefined'
 
 class UISoundEngine {
-  private arrayBuffers = new Map<PlayableUISoundCue, Promise<ArrayBuffer>>()
+  private arrayBuffers = new Map<string, Promise<ArrayBuffer>>()
 
   private audioContext: AudioContext | null = null
 
   private audioContextCtor: AudioContextCtor | null = null
 
-  private buffers = new Map<PlayableUISoundCue, Promise<AudioBuffer>>()
+  private buffers = new Map<string, Promise<AudioBuffer>>()
 
   private lastPlayedAt = new Map<PlayableUISoundCue, number>()
 
@@ -98,7 +98,7 @@ class UISoundEngine {
     }
 
     PLAYABLE_UI_SOUND_CUES.forEach((cue) => {
-      void this.fetchArrayBuffer(cue)
+      void this.fetchArrayBuffer(cue).catch(() => {})
     })
   }
 
@@ -124,7 +124,7 @@ class UISoundEngine {
 
     if (this.unlocked) {
       PLAYABLE_UI_SOUND_CUES.forEach((cue) => {
-        void this.decodeBuffer(cue)
+        void this.decodeBuffer(cue).catch(() => {})
       })
     }
 
@@ -231,7 +231,8 @@ class UISoundEngine {
   }
 
   private async decodeBuffer(cue: PlayableUISoundCue) {
-    const existingPromise = this.buffers.get(cue)
+    const src = CUE_CONFIGS[cue].src
+    const existingPromise = this.buffers.get(src)
     if (existingPromise) {
       return existingPromise
     }
@@ -245,17 +246,18 @@ class UISoundEngine {
       return context.decodeAudioData(arrayBuffer.slice(0))
     })
 
-    this.buffers.set(cue, decodePromise)
+    this.buffers.set(src, decodePromise)
     return decodePromise
   }
 
   private fetchArrayBuffer(cue: PlayableUISoundCue) {
-    const existingPromise = this.arrayBuffers.get(cue)
+    const src = CUE_CONFIGS[cue].src
+    const existingPromise = this.arrayBuffers.get(src)
     if (existingPromise) {
       return existingPromise
     }
 
-    const fetchPromise = fetch(CUE_CONFIGS[cue].src).then(async (response) => {
+    const fetchPromise = fetch(src).then(async (response) => {
       if (!response.ok) {
         throw new Error(`Unable to load sound cue: ${cue}`)
       }
@@ -263,7 +265,7 @@ class UISoundEngine {
       return response.arrayBuffer()
     })
 
-    this.arrayBuffers.set(cue, fetchPromise)
+    this.arrayBuffers.set(src, fetchPromise)
     return fetchPromise
   }
 

@@ -100,7 +100,6 @@ export function ProjectCard({
     <Link
       to={to}
       className="project-card project-card--link"
-      aria-label={`${title} — ${description}`}
     >
       {body}
     </Link>
