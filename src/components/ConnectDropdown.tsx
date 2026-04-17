@@ -92,17 +92,9 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
       }
     }
 
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeMenu()
-      }
-    }
-
     document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('keydown', handleEscape, true)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleEscape, true)
     }
   }, [closeMenu, isOpen])
 

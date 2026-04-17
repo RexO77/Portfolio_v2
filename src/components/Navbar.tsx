@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { DiscoverNav } from '@/components/ui/discover-nav'
@@ -20,7 +20,7 @@ import { useCopyText } from '@/hooks/use-copy-text'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 
-const MOBILE_SOCIAL_ICONS: Record<string, React.ReactNode> = {
+const MOBILE_SOCIAL_ICONS: Record<string, ReactNode> = {
   email: <Mail className="h-4 w-4" />,
   twitter: <Twitter className="h-4 w-4" />,
   github: <GitHub className="h-4 w-4" />,
@@ -55,7 +55,8 @@ function NavbarContent() {
   const { introHandoffStarted, introComplete } = useIntroState()
   const activeItem = getActiveNavTarget(location.pathname, location.hash)
 
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isMobileMenuRequested, setIsMobileOpen] = useState(false)
+  const isMobileOpen = isMobileMenuRequested && isMobileViewport
   const { copied: emailCopied, copy: copyEmail } = useCopyText(connectEmail)
 
   const scrollToHash = useCallback(
@@ -105,23 +106,6 @@ function NavbarContent() {
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isMobileOpen])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const mediaQueryList = window.matchMedia('(max-width: 900px)')
-    const handleBreakpointChange = (event: MediaQueryListEvent) => {
-      if (!event.matches) {
-        setIsMobileOpen(false)
-      }
-    }
-
-    mediaQueryList.addEventListener('change', handleBreakpointChange)
-
-    return () => mediaQueryList.removeEventListener('change', handleBreakpointChange)
-  }, [])
 
   const handleSkipToContent = useCallback(() => {
     window.requestAnimationFrame(() => {
