@@ -90,7 +90,7 @@ export default function QuestionLibraryCaseStudy() {
   )
 
   return (
-    <div className="case-study">
+    <div id="main-content" className="case-study">
       <Navbar />
 
       <section

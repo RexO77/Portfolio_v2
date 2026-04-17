@@ -417,8 +417,15 @@ function Header({
       <motion.div
         layout="position"
         layoutId={`${layoutIdPrefix}-${chevronKey}`}
-        animate={{ rotate: open ? 0 : 180 }}
-        className="shrink-0 text-d-bg/72"
+        animate={{ opacity: open ? 0 : 1, rotate: open ? 0 : 180 }}
+        transition={{
+          opacity: { duration: open ? 0.16 : 0.22, ease: [0.16, 1, 0.3, 1] },
+        }}
+        aria-hidden={open ? 'true' : undefined}
+        className={cn(
+          'shrink-0 text-d-bg/72',
+          open && 'pointer-events-none',
+        )}
       >
         <ChevronUpGlyph />
       </motion.div>
