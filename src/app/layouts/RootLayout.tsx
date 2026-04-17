@@ -1,12 +1,17 @@
 import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useLocation, useOutlet } from 'react-router-dom'
+import ClickBurstOverlay from '@/components/ClickBurstOverlay'
+import UISoundProvider from '@/components/UISoundProvider'
 import { useIntroState } from '@/features/intro/useIntroState'
 import {
   pageShellEnter,
   pageShellExit,
   pageShellTransition,
 } from '@/lib/motion'
+
+const HASH_SCROLL_MAX_ATTEMPTS = 40
+const HASH_SCROLL_RETRY_DELAY_MS = 50
 
 export function RootLayout() {
   const location = useLocation()
@@ -22,10 +27,16 @@ export function RootLayout() {
       return
     }
 
-    let frame = 0
+    let cancelled = false
     let attempts = 0
+    let frame = 0
+    let timeoutId = 0
 
     const syncScrollPosition = () => {
+      if (cancelled) {
+        return
+      }
+
       if (location.hash) {
         const target = scrollRoot.querySelector<HTMLElement>(location.hash)
         if (target) {
@@ -36,9 +47,11 @@ export function RootLayout() {
           return
         }
 
-        if (attempts < 12) {
+        if (attempts < HASH_SCROLL_MAX_ATTEMPTS) {
           attempts += 1
-          frame = window.requestAnimationFrame(syncScrollPosition)
+          timeoutId = window.setTimeout(() => {
+            frame = window.requestAnimationFrame(syncScrollPosition)
+          }, HASH_SCROLL_RETRY_DELAY_MS)
           return
         }
       }
@@ -51,14 +64,20 @@ export function RootLayout() {
 
     frame = window.requestAnimationFrame(syncScrollPosition)
 
-    return () => window.cancelAnimationFrame(frame)
-  }, [isIntroActive, location.hash, location.pathname, shouldReduceMotion])
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frame)
+      window.clearTimeout(timeoutId)
+    }
+  }, [isIntroActive, location.hash, location.pathname, outlet, shouldReduceMotion])
 
   return (
     <div
       ref={scrollRootRef}
       className={`scroll-root${isIntroActive ? ' scroll-root--locked' : ''}`}
     >
+      <UISoundProvider />
+      <ClickBurstOverlay />
       <AnimatePresence initial={false} mode="sync">
         <motion.div
           key={location.pathname}

@@ -60,6 +60,8 @@ export interface ProjectSummary {
   timeline: string
   tags: string[]
   imageSrc: string
+  videoSrc?: string
+  year?: string
   to: string
   ctaLabel?: string
   mobileCtaLabel?: string
@@ -173,18 +175,23 @@ export interface LifePhoto {
   z?: number
 }
 
-export interface LifeNote {
-  left: string
-  top: string
-  z?: number
-  label: string
-  body: string
+export interface LifeEssayPortrait {
+  src: string
+  alt: string
+  caption: string
+}
+
+export interface LifeEssayContent {
+  eyebrow: string
+  titleLines: string[]
+  portrait: LifeEssayPortrait
+  paragraphs: string[]
+  signoff: string
 }
 
 export interface LifePageContent {
   titleLead: string
   titleEmphasis: string
-  hint: string
   photos: LifePhoto[]
-  notes: LifeNote[]
+  essay: LifeEssayContent
 }

@@ -50,7 +50,7 @@ export default function HomePage() {
   }, [heroRevealStarted])
 
   return (
-    <main className="homepage">
+    <main id="main-content" className="homepage">
       <div className="glow-orb" aria-hidden="true">
         <div className="glow-layer glow-green" />
         <div className="glow-layer glow-yellow" />
