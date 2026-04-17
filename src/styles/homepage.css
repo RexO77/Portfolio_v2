@@ -170,7 +170,7 @@
   align-items: center;
   justify-content: space-between;
   gap: clamp(10px, 1.4vw, 20px);
-  width: min(var(--content-width), calc(100% - var(--space-6) * 2));
+  width: min(var(--content-width), calc(100% - var(--space-6) - var(--space-6)));
   margin-inline: auto;
   padding: 6px 8px 6px 20px;
   border: 1px solid rgba(30, 30, 30, 0.08);

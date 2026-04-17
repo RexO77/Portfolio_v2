@@ -128,11 +128,9 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
 
     document.addEventListener('mousedown', handleClickOutside)
     document.addEventListener('keydown', handleEscape, true)
-    window.addEventListener('keydown', handleEscape, true)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleEscape, true)
-      window.removeEventListener('keydown', handleEscape, true)
     }
   }, [closeMenu, isOpen])
 

@@ -5,9 +5,9 @@ import {
   consumeUISoundNavigationIntent,
   getClosestUISoundTarget,
   getDelegatedUISoundCue,
+  getInternalNavigationRoute,
   getLastUISoundRequestAt,
   isDisabledUISoundTarget,
-  isInternalNavigationTarget,
   markUISoundNavigationIntent,
   playUISound,
   primeUISounds,
@@ -65,8 +65,9 @@ const UISoundProvider = () => {
         return
       }
 
-      if (target && isInternalNavigationTarget(target, event)) {
-        markUISoundNavigationIntent()
+      const navigationRoute = target ? getInternalNavigationRoute(target, event) : null
+      if (navigationRoute) {
+        markUISoundNavigationIntent(navigationRoute)
         return
       }
 
@@ -101,8 +102,9 @@ const UISoundProvider = () => {
 
       void unlockUISounds()
 
-      if (isInternalNavigationTarget(target, event)) {
-        markUISoundNavigationIntent()
+      const navigationRoute = getInternalNavigationRoute(target, event)
+      if (navigationRoute) {
+        markUISoundNavigationIntent(navigationRoute)
         return
       }
 
@@ -131,7 +133,7 @@ const UISoundProvider = () => {
 
     lastRouteRef.current = currentRoute
 
-    if (consumeUISoundNavigationIntent()) {
+    if (consumeUISoundNavigationIntent(currentRoute)) {
       void playUISound('nav')
     }
   }, [location.hash, location.pathname, location.search])

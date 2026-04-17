@@ -78,10 +78,10 @@ export function ProjectCard({
 
   const header = (
     <div className="project-card__header">
-      <span className="project-card__year">{year ?? ''}</span>
+      {year ? <span className="project-card__year">{year}</span> : null}
       <h3 className="project-card__title">{title}</h3>
       <p className="project-card__description">{description}</p>
-      <span className="project-card__label">{label ?? ''}</span>
+      {label ? <span className="project-card__label">{label}</span> : null}
     </div>
   )
 

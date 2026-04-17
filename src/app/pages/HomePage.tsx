@@ -50,32 +50,34 @@ export default function HomePage() {
   }, [heroRevealStarted])
 
   return (
-    <main id="main-content" className="homepage">
-      <div className="glow-orb" aria-hidden="true">
-        <div className="glow-layer glow-green" />
-        <div className="glow-layer glow-yellow" />
-        <div className="glow-layer glow-blue" />
-        <div className="glow-layer glow-pink" />
-      </div>
-
+    <>
       <Navbar />
 
-      <section className="hero">
-        <div className="hero__text-wrapper">
-          <h1 className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}>
-            <HeroTextCSS animate={heroRevealStarted} />
-          </h1>
+      <main id="main-content" tabIndex={-1} className="homepage">
+        <div className="glow-orb" aria-hidden="true">
+          <div className="glow-layer glow-green" />
+          <div className="glow-layer glow-yellow" />
+          <div className="glow-layer glow-blue" />
+          <div className="glow-layer glow-pink" />
         </div>
-      </section>
 
-      <div className="homepage__anchor" id="labs" aria-hidden="true" />
-      <div className="projects-section" id="work">
-        {featuredProjects.map((project) => (
-          <ProjectCard key={project.id} {...project} trackIntroLoad />
-        ))}
-      </div>
-      <div className="homepage__anchor" id="blog" aria-hidden="true" />
-    </main>
+        <section className="hero">
+          <div className="hero__text-wrapper">
+            <h1 className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}>
+              <HeroTextCSS animate={heroRevealStarted} />
+            </h1>
+          </div>
+        </section>
+
+        <div className="homepage__anchor" id="labs" aria-hidden="true" />
+        <div className="projects-section" id="work">
+          {featuredProjects.map((project) => (
+            <ProjectCard key={project.id} {...project} trackIntroLoad />
+          ))}
+        </div>
+        <div className="homepage__anchor" id="blog" aria-hidden="true" />
+      </main>
+    </>
   )
 }
 

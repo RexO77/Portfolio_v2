@@ -139,13 +139,22 @@ function NavbarContent() {
     }, 2000)
   }, [])
 
+  const handleSkipToContent = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      const target = document.getElementById('main-content')
+      if (target instanceof HTMLElement) {
+        target.focus()
+      }
+    })
+  }, [])
+
   const mobilePanelTransition = shouldReduceMotion
     ? { duration: 0 }
     : { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const }
 
   return (
     <>
-      <a href="#main-content" className="skip-link">
+      <a href="#main-content" className="skip-link" onClick={handleSkipToContent}>
         Skip to main content
       </a>
 

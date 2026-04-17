@@ -77,6 +77,8 @@ class UISoundEngine {
 
   private navigationIntentExpiresAt = 0
 
+  private pendingNavigationRoute: string | null = null
+
   private lastRequestedAt = 0
 
   private unlocked = false
@@ -198,21 +200,29 @@ class UISoundEngine {
     }
   }
 
-  markNavigationIntent() {
+  markNavigationIntent(route: string) {
     if (!this.isSupported()) {
       return
     }
 
+    this.pendingNavigationRoute = route
     this.navigationIntentExpiresAt = performance.now() + INTERNAL_NAVIGATION_INTENT_TTL_MS
   }
 
-  consumeNavigationIntent() {
+  consumeNavigationIntent(currentRoute: string) {
     if (!this.isSupported()) {
       return false
     }
 
-    const hasIntent = performance.now() <= this.navigationIntentExpiresAt
-    this.navigationIntentExpiresAt = 0
+    const hasIntent =
+      performance.now() <= this.navigationIntentExpiresAt
+      && this.pendingNavigationRoute === currentRoute
+
+    if (hasIntent || performance.now() > this.navigationIntentExpiresAt) {
+      this.navigationIntentExpiresAt = 0
+      this.pendingNavigationRoute = null
+    }
+
     return hasIntent
   }
 
@@ -368,12 +378,34 @@ export const isInternalNavigationTarget = (
   return href.origin === window.location.origin
 }
 
-export const markUISoundNavigationIntent = () => {
-  uiSoundEngine.markNavigationIntent()
+export const getInternalNavigationRoute = (
+  element: HTMLElement,
+  event?:
+    | Pick<MouseEvent, 'altKey' | 'button' | 'ctrlKey' | 'metaKey' | 'shiftKey'>
+    | Pick<KeyboardEvent, 'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'>,
+) => {
+  if (!isInternalNavigationTarget(element, event)) {
+    return null
+  }
+
+  const anchor = element.closest<HTMLAnchorElement>('a[href]')
+  if (!anchor) {
+    return null
+  }
+
+  const href = new URL(anchor.href, window.location.href)
+  const targetRoute = `${href.pathname}${href.search}${href.hash}`
+  const currentRoute = `${window.location.pathname}${window.location.search}${window.location.hash}`
+
+  return targetRoute === currentRoute ? null : targetRoute
 }
 
-export const consumeUISoundNavigationIntent = () => {
-  return uiSoundEngine.consumeNavigationIntent()
+export const markUISoundNavigationIntent = (route: string) => {
+  uiSoundEngine.markNavigationIntent(route)
+}
+
+export const consumeUISoundNavigationIntent = (currentRoute: string) => {
+  return uiSoundEngine.consumeNavigationIntent(currentRoute)
 }
 
 export const playUISound = (cue: UISoundCue) => {
