@@ -1,12 +1,20 @@
-/* ── Life (draggable canvas) ─────────────────────────── */
+/* ── Life (draggable canvas + scroll essay) ─────────── */
 
 .life-page {
   position: relative;
-  width: 100dvw;
+  width: 100%;
+  max-width: 100dvw;
   min-height: 100dvh;
-  height: 100dvh;
-  overflow: hidden;
   background: var(--color-bg);
+}
+
+/* ── Stage: draggable polaroid canvas (fills first viewport) ── */
+
+.life-page__stage {
+  position: relative;
+  min-height: 88dvh;
+  width: 100%;
+  isolation: isolate;
 }
 
 .life-page__canvas {
@@ -43,20 +51,6 @@
   font-weight: var(--weight-bold);
 }
 
-.life-page__hint {
-  position: absolute;
-  bottom: clamp(1rem, 3vw, 1.75rem);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  color: var(--color-text-tertiary);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  z-index: 2;
-  pointer-events: none;
-}
-
 .life-polaroid {
   display: flex;
   flex-direction: column;
@@ -80,27 +74,152 @@
   object-fit: cover;
 }
 
-.life-note {
-  max-width: min(280px, 72vw);
-  padding: var(--space-5) var(--space-6);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+/* ── Essay (personal note) ───────────────────────────── */
+
+.life-essay {
+  position: relative;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding: clamp(var(--space-8), 5vw, var(--space-16)) var(--content-padding)
+    clamp(var(--space-20), 12vw, var(--space-32));
+  scroll-margin-top: var(--space-16);
+}
+
+.life-essay__intro {
+  max-width: 46rem;
+}
+
+.life-essay__eyebrow {
+  margin-bottom: var(--space-3);
   font-family: var(--font-sans);
-}
-
-.life-note__label {
   font-size: var(--text-xs);
-  text-transform: uppercase;
+  font-weight: var(--weight-medium);
   letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--color-text-tertiary);
-  margin-bottom: var(--space-2);
 }
 
-.life-note__body {
+.life-essay__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.75rem, 8vw, 6rem);
+  font-weight: var(--weight-normal);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.life-essay__title-line {
+  display: block;
+}
+
+/* Portrait sits flush-left, modestly sized, between intro and prose. */
+
+.life-essay__portrait {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: clamp(var(--space-4), 3vw, var(--space-8)) 0
+    clamp(var(--space-8), 5vw, var(--space-12));
+  width: min(100%, 28rem);
+}
+
+.life-essay__portrait-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow:
+    0 1px 0 rgba(30, 30, 30, 0.04),
+    0 24px 60px rgba(141, 111, 32, 0.16);
+}
+
+.life-essay__portrait-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.life-essay__portrait-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-inline: 2px;
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
+  color: var(--color-text-tertiary);
+}
+
+.life-essay__portrait-meta {
+  color: var(--color-text-tertiary);
+}
+
+/* Body prose — single column, generous line-height, human. */
+
+.life-essay__body {
+  max-width: 36rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.life-essay__paragraph {
+  font-family: var(--font-sans);
+  font-size: clamp(var(--text-base), 1.2vw, var(--text-lg));
+  line-height: 1.7;
   color: var(--color-text-secondary);
-  user-select: text;
+  text-wrap: pretty;
+}
+
+.life-essay__paragraph--lead {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(var(--text-xl), 2.2vw, var(--text-2xl));
+  line-height: var(--leading-snug);
+  color: var(--color-text);
+}
+
+.life-essay__signoff {
+  margin-top: clamp(var(--space-10), 6vw, var(--space-12));
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(var(--text-lg), 1.8vw, var(--text-2xl));
+  color: var(--color-text);
+}
+
+@media (min-width: 900px) {
+  .life-essay {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    grid-template-areas:
+      'intro    intro'
+      'portrait body'
+      '.        signoff';
+    column-gap: clamp(var(--space-10), 6vw, var(--space-16));
+    row-gap: clamp(var(--space-5), 3vw, var(--space-10));
+  }
+
+  .life-essay__intro {
+    grid-area: intro;
+  }
+
+  .life-essay__portrait {
+    grid-area: portrait;
+    margin: 0;
+    justify-self: start;
+    align-self: start;
+    position: sticky;
+    top: calc(var(--space-16) + var(--space-4));
+  }
+
+  .life-essay__body {
+    grid-area: body;
+  }
+
+  .life-essay__signoff {
+    grid-area: signoff;
+    margin-top: 0;
+  }
 }

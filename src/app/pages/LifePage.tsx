@@ -15,7 +15,6 @@ function polaroidLayout(index: number, compact: boolean) {
   return { rotation, width, height }
 }
 
-
 export default function LifePage() {
   const compact = useMediaQuery('(max-width: 767px)')
 
@@ -30,68 +29,110 @@ export default function LifePage() {
     [compact],
   )
 
+  const { essay } = lifePageContent
+
   return (
-    <div className="life-page">
+    <>
       <Navbar />
 
-      <div className="life-page__title-layer" aria-hidden="true">
-        <p className="life-page__title">
-          {lifePageContent.titleLead} <strong>{lifePageContent.titleEmphasis}</strong>
-        </p>
-      </div>
+      <main id="main-content" tabIndex={-1} className="life-page">
+        <section className="life-page__stage" aria-label="Memories">
+          <div className="life-page__title-layer" aria-hidden="true">
+            <p className="life-page__title">
+              {lifePageContent.titleLead}{' '}
+              <strong>{lifePageContent.titleEmphasis}</strong>
+            </p>
+          </div>
 
-      <p className="life-page__hint">{lifePageContent.hint}</p>
+          <div className="life-page__canvas">
+            <DragElements dragMomentum={false}>
+              {polaroids.map(
+                ({ src, alt, index, rotation, width, height, left, top, z }) => {
+                  const prioritizeImage = index < 2
 
-      <div className="life-page__canvas">
-        <DragElements dragMomentum={false}>
-          {polaroids.map(({ src, alt, rotation, width, height, left, top, z }) => (
-            <div
-              key={src}
-              className="life-polaroid"
-              style={{
-                left,
-                top,
-                zIndex: z,
-                width: `${width}px`,
-                height: `${height}px`,
-                transform: `rotate(${rotation}deg)`,
-              }}
-            >
-              <div
-                className="life-polaroid__frame"
-                style={{
-                  width: `${width - 8}px`,
-                  height: `${height - 28}px`,
-                }}
+                  return (
+                    <div
+                      key={src}
+                      className="life-polaroid"
+                      style={{
+                        left,
+                        top,
+                        zIndex: z,
+                        width: `${width}px`,
+                        height: `${height}px`,
+                        transform: `rotate(${rotation}deg)`,
+                      }}
+                    >
+                      <div
+                        className="life-polaroid__frame"
+                        style={{
+                          width: `${width - 8}px`,
+                          height: `${height - 28}px`,
+                        }}
+                      >
+                        <img
+                          src={src}
+                          alt={alt}
+                          width={width - 8}
+                          height={height - 28}
+                          draggable={false}
+                          loading={prioritizeImage ? 'eager' : 'lazy'}
+                          decoding="async"
+                          fetchPriority={prioritizeImage ? 'high' : 'auto'}
+                        />
+                      </div>
+                    </div>
+                  )
+                },
+              )}
+            </DragElements>
+          </div>
+        </section>
+
+        <section id="life-essay" className="life-essay" aria-labelledby="life-essay-title">
+          <header className="life-essay__intro">
+            <p className="life-essay__eyebrow">{essay.eyebrow}</p>
+            <h1 id="life-essay-title" className="life-essay__title">
+              {essay.titleLines.map((line) => (
+                <span key={line} className="life-essay__title-line">
+                  {line}
+                </span>
+              ))}
+            </h1>
+          </header>
+
+          <figure className="life-essay__portrait">
+            <div className="life-essay__portrait-frame">
+              <img
+                src={essay.portrait.src}
+                alt={essay.portrait.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption className="life-essay__portrait-caption">
+              <span className="life-essay__portrait-meta">{essay.portrait.caption}</span>
+            </figcaption>
+          </figure>
+
+          <div className="life-essay__body">
+            {essay.paragraphs.map((paragraph, index) => (
+              <p
+                key={index}
+                className={
+                  index === 0
+                    ? 'life-essay__paragraph life-essay__paragraph--lead'
+                    : 'life-essay__paragraph'
+                }
               >
-                <img
-                  src={src}
-                  alt={alt}
-                  draggable={false}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </div>
-          ))}
+                {paragraph}
+              </p>
+            ))}
+          </div>
 
-          {lifePageContent.notes.map((note) => (
-            <div
-              key={note.label}
-              className="life-note"
-              style={{
-                left: note.left,
-                top: note.top,
-                zIndex: note.z,
-                transform: `rotate(${((note.label.length * 2) % 9) - 4}deg)`,
-              }}
-            >
-              <p className="life-note__label">{note.label}</p>
-              <p className="life-note__body">{note.body}</p>
-            </div>
-          ))}
-        </DragElements>
-      </div>
-    </div>
+          <p className="life-essay__signoff">{essay.signoff}</p>
+        </section>
+      </main>
+    </>
   )
 }

@@ -1,0 +1,57 @@
+.click-burst {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: var(--z-toast, 300);
+  pointer-events: none;
+  color: var(--color-text);
+  transform: rotate(var(--click-burst-rotation, 0deg));
+}
+
+.click-burst__ray {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--click-burst-angle, 0deg));
+}
+
+.click-burst__line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background-color: currentColor;
+  transform-origin: 50% 100%;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: click-burst-line-emit var(--click-burst-duration, 460ms)
+    var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+@keyframes click-burst-line-emit {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 1px)) scaleY(0.45);
+  }
+  22% {
+    opacity: 0.95;
+    transform: translate(-50%, calc(-100% - 3px)) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 11px)) scaleY(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .click-burst {
+    display: none;
+  }
+}

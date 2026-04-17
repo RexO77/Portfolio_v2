@@ -90,9 +90,10 @@ export default function QuestionLibraryCaseStudy() {
   )
 
   return (
-    <div className="case-study">
+    <>
       <Navbar />
 
+      <main id="main-content" tabIndex={-1} className="case-study">
       <section
         id={CASE_STUDY_SECTION_IDS.overview}
         className="case-study__section case-study__section--hero case-study__nav-target"
@@ -376,6 +377,7 @@ export default function QuestionLibraryCaseStudy() {
         containerSelector=".scroll-root"
         layoutIdPrefix="question-library-case-study"
       />
-    </div>
+      </main>
+    </>
   )
 }

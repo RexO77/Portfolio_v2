@@ -1,74 +1,92 @@
 import type { LifePageContent } from '@/types/content'
 
+import memory01 from '@/assets/life/memory-01.webp'
+import memory02 from '@/assets/life/memory-02.webp'
+import memory03 from '@/assets/life/memory-03.webp'
+import memory04 from '@/assets/life/memory-04.webp'
+import memory05 from '@/assets/life/memory-05.webp'
+import memory06 from '@/assets/life/memory-06.webp'
+import memory07 from '@/assets/life/memory-07.webp'
+import memory08 from '@/assets/life/memory-08.webp'
+import memory09 from '@/assets/life/memory-09.webp'
+
 export const lifePageContent: LifePageContent = {
   titleLead: 'all your',
   titleEmphasis: 'memories.',
-  hint: 'Drag photos and notes',
   photos: [
     {
-      src: 'https://images.unsplash.com/photo-1683746531526-3bca2bc901b8?q=80&w=1820&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: memory01,
       alt: 'Memory 1',
-      left: '6%',
-      top: '12%',
+      left: '5%',
+      top: '10%',
       z: 2,
     },
     {
-      src: 'https://images.unsplash.com/photo-1631561729243-9b3291efceae?q=80&w=1885&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: memory02,
       alt: 'Memory 2',
-      left: '58%',
-      top: '8%',
+      left: '64%',
+      top: '6%',
       z: 3,
     },
     {
-      src: 'https://images.unsplash.com/photo-1635434002329-8ab192fe01e1?q=80&w=2828&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: memory03,
       alt: 'Memory 3',
-      left: '38%',
+      left: '78%',
+      top: '32%',
+      z: 2,
+    },
+    {
+      src: memory04,
+      alt: 'Memory 4',
+      left: '8%',
       top: '42%',
       z: 4,
     },
     {
-      src: 'https://images.unsplash.com/photo-1719586799413-3f42bb2a132d?q=80&w=2048&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      alt: 'Memory 4',
-      left: '72%',
-      top: '48%',
-      z: 2,
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1720561467986-ca3d408ca30b?q=80&w=2048&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: memory05,
       alt: 'Memory 5',
-      left: '12%',
-      top: '58%',
+      left: '44%',
+      top: '66%',
       z: 3,
     },
     {
-      src: 'https://images.unsplash.com/photo-1724403124996-64115f38cd3f?q=80&w=3082&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      src: memory06,
       alt: 'Memory 6',
-      left: '48%',
-      top: '72%',
+      left: '70%',
+      top: '60%',
       z: 2,
     },
-  ],
-  notes: [
     {
-      left: '22%',
-      top: '22%',
-      z: 5,
-      label: 'Now',
-      body: 'This is a loose scrapbook of places, light, and everyday moments. Swap the copy and images for your own story.',
+      src: memory07,
+      alt: 'Memory 7',
+      left: '16%',
+      top: '72%',
+      z: 3,
     },
     {
-      left: '62%',
-      top: '28%',
-      z: 5,
-      label: 'How to read',
-      body: 'Drag any photo or note. Stack them, uncover the center title, or arrange a little scene—there is no correct order.',
-    },
-    {
-      left: '18%',
-      top: '38%',
-      z: 5,
-      label: 'Colophon',
-      body: 'Replace the Unsplash URLs in LifePage with your own files under src/assets when you are ready.',
+      src: memory08,
+      alt: 'Memory 8',
+      left: '36%',
+      top: '20%',
+      z: 4,
     },
   ],
+  essay: {
+    eyebrow: 'A personal note',
+    titleLines: ['Life, beyond', 'the portfolio'],
+    portrait: {
+      src: memory09,
+      alt: 'Nischal on graduation day, 2025',
+      caption: 'Graduation day, 2025',
+    },
+    paragraphs: [
+      'Hey — thanks for being here.',
+      "I'm Nischal. I studied Computer Science at Jyothy Institute of Technology. Went in thinking I'd write code for a living. Came out realizing I care more about how software feels than how it runs.",
+      "Somewhere between algorithms and data structures, I started noticing the gaps where technically correct software still confused people. I'd watch friends use my class projects and quietly rewrite the parts that tripped them up. That habit never stopped.",
+      "My internship at Varcons Technologies humbled me fast. I built a flow I thought was perfect; users broke it in minutes. That's when I stopped trusting assumptions and started trusting the users. At WinWire, working on enterprise tools taught me that clarity isn't decoration. I also took a side project all the way to the Smart India Hackathon finals, which proved what happens when you back up ideas with solid research.",
+      "These days, I'm a full-time Product Designer at Talview. I shape our core systems and recently led a complete overhaul of our Admin Login and Authentication flow. Working directly with our CTO on complex challenges like assessment engines has pushed me to ruthlessly strip away UI clutter. My design process is strictly system-oriented now — driven by heuristics, cognitive psychology, and engineering logic rather than just gut feeling.",
+      "When I'm not designing, I'm usually obsessing over how things work on a granular level — funneling my deep dives into cognitive neuroscience into my Light Idea Labs blog, or just shitposting on X. Otherwise, you'll find me following the mechanics of Formula One, reading, or bringing my camera along on my travels. Fair warning: if I get excited about a flawless user flow or a genuinely great burrito, you will definitely know about it.",
+    ],
+    signoff: '— Nischal',
+  },
 }

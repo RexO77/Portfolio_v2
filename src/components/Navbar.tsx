@@ -1,25 +1,40 @@
-import { useCallback } from 'react'
-import { useReducedMotion } from 'motion/react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { DiscoverNav } from '@/components/ui/discover-nav'
-import { navItems } from '@/content/site'
+import { ConnectDropdown } from '@/components/ConnectDropdown'
+import {
+  Check,
+  CloseIcon,
+  ExternalLink,
+  FileText,
+  GitHub,
+  LinkedIn,
+  Mail,
+  MenuIcon,
+  Twitter,
+} from '@/components/icons'
+import { connectEmail, connectLinks, navItems } from '@/content/site'
 import { useIntroState } from '@/features/intro/useIntroState'
+import { useCopyText } from '@/hooks/use-copy-text'
+import { useMediaQuery } from '@/hooks/use-media-query'
+import { cn } from '@/lib/utils'
+
+const MOBILE_SOCIAL_ICONS: Record<string, ReactNode> = {
+  email: <Mail className="h-4 w-4" />,
+  twitter: <Twitter className="h-4 w-4" />,
+  github: <GitHub className="h-4 w-4" />,
+  linkedin: <LinkedIn className="h-4 w-4" />,
+  resume: <FileText className="h-4 w-4" />,
+}
 
 function getActiveNavTarget(pathname: string, hash: string) {
   if (pathname === '/life') {
     return '/life'
   }
 
-  if (pathname.startsWith('/projects/')) {
-    return '/#work'
-  }
-
   if (pathname === '/' && hash) {
     return `/${hash}`
-  }
-
-  if (pathname === '/') {
-    return '/#work'
   }
 
   return null
@@ -27,10 +42,22 @@ function getActiveNavTarget(pathname: string, hash: string) {
 
 export function Navbar() {
   const location = useLocation()
+  const routeStateKey = `${location.pathname}${location.hash}`
+
+  return <NavbarContent key={routeStateKey} />
+}
+
+function NavbarContent() {
+  const location = useLocation()
   const navigate = useNavigate()
   const shouldReduceMotion = useReducedMotion()
+  const isMobileViewport = useMediaQuery('(max-width: 900px)')
   const { introHandoffStarted, introComplete } = useIntroState()
   const activeItem = getActiveNavTarget(location.pathname, location.hash)
+
+  const [isMobileMenuRequested, setIsMobileOpen] = useState(false)
+  const isMobileOpen = isMobileMenuRequested && isMobileViewport
+  const { copied: emailCopied, copy: copyEmail } = useCopyText(connectEmail)
 
   const scrollToHash = useCallback(
     (hash: string) => {
@@ -71,23 +98,158 @@ export function Navbar() {
     [location.hash, location.pathname, navigate, scrollToHash],
   )
 
+  useEffect(() => {
+    if (!isMobileOpen) return
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileOpen(false)
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isMobileOpen])
+
+  const handleSkipToContent = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      const target = document.getElementById('main-content')
+      if (target instanceof HTMLElement) {
+        target.focus()
+      }
+    })
+  }, [])
+
+  const mobilePanelTransition = shouldReduceMotion
+    ? { duration: 0 }
+    : { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const }
+
   return (
-    <header
-      className={`navbar${
-        !introComplete ? ' navbar--intro-pending' : ''
-      }${introHandoffStarted ? ' navbar--intro-handoff' : ''}`}
-    >
-      <Link to="/" className="navbar__brand">
-        <span className="navbar__logo">Nischal Skanda</span>
-      </Link>
-      <div className="navbar__nav-wrap">
-        <DiscoverNav
-          items={navItems}
-          activeItem={activeItem}
-          onSelect={handleSelect}
-          className="ml-auto"
-        />
-      </div>
-    </header>
+    <>
+      <a href="#main-content" className="skip-link" onClick={handleSkipToContent}>
+        Skip to main content
+      </a>
+
+      <header
+        className={cn(
+          'navbar',
+          !introComplete && 'navbar--intro-pending',
+          introHandoffStarted && 'navbar--intro-handoff',
+          isMobileOpen && 'navbar--mobile-open',
+        )}
+      >
+        <div className="navbar__shell">
+          <Link to="/" className="navbar__brand">
+            <span className="navbar__logo">Nischal Skanda</span>
+          </Link>
+
+          <div className="navbar__nav-wrap">
+            <DiscoverNav
+              items={navItems}
+              activeItem={activeItem}
+              onSelect={handleSelect}
+              className="ml-auto"
+            />
+          </div>
+
+          <div className="navbar__connect-wrap">
+            <ConnectDropdown />
+          </div>
+
+          <button
+            type="button"
+            className="navbar__mobile-toggle"
+            onClick={() => setIsMobileOpen((v) => !v)}
+            aria-expanded={isMobileOpen}
+            aria-controls="mobile-navigation"
+            aria-label={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          >
+            {isMobileOpen ? (
+              <CloseIcon className="h-5 w-5" />
+            ) : (
+              <MenuIcon className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {isMobileViewport && isMobileOpen && (
+            <motion.div
+              id="mobile-navigation"
+              role="navigation"
+              aria-label="Mobile navigation"
+              className="navbar__mobile-panel"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={mobilePanelTransition}
+            >
+              <ul className="navbar__mobile-list">
+                {navItems.map((item) => (
+                  <li key={item.to}>
+                    <a
+                      href={item.to}
+                      className="navbar__mobile-link"
+                      onClick={(event) => {
+                        event.preventDefault()
+                        setIsMobileOpen(false)
+                        handleSelect(item)
+                      }}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="navbar__mobile-connect">
+                <p className="navbar__mobile-connect-label">Connect with me</p>
+
+                <button
+                  type="button"
+                  className={cn(
+                    'navbar__mobile-email',
+                    emailCopied && 'navbar__mobile-email--copied',
+                  )}
+                  onClick={() => {
+                    void copyEmail()
+                  }}
+                >
+                  {emailCopied ? (
+                    <>
+                      <Check className="h-4 w-4" />
+                      <span>Email copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="h-4 w-4" />
+                      <span>Copy email</span>
+                    </>
+                  )}
+                </button>
+
+                <ul className="navbar__mobile-socials">
+                  {connectLinks
+                    .filter((link) => link.kind === 'external')
+                    .map((link) => (
+                      <li key={link.key}>
+                        <a
+                          className="navbar__mobile-social"
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setIsMobileOpen(false)}
+                        >
+                          <span className="navbar__mobile-social-icon">
+                            {MOBILE_SOCIAL_ICONS[link.key]}
+                          </span>
+                          <span>{link.label}</span>
+                          <ExternalLink className="ml-auto h-3 w-3 opacity-50" />
+                        </a>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+    </>
   )
 }

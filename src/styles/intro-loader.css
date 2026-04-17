@@ -31,7 +31,9 @@
   text-align: center;
   text-wrap: balance;
   padding-inline: 24px;
-  will-change: opacity;
+  will-change: opacity, transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .intro-loader__greeting[data-script='latin'] {

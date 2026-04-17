@@ -8,10 +8,17 @@ interface IntroLoaderProps {
   onComplete: () => void
 }
 
-const STANDARD_STEP_MS = 260
-const REDUCED_MOTION_STEP_MS = 220
-const STANDARD_EXIT_MS = 420
-const REDUCED_MOTION_EXIT_MS = 280
+// Sequential transition (mode="wait"): previous greeting eases out fully,
+// then the next eases in. stepMs = exit (180ms) + enter (200ms) + hold (120ms).
+// Seven greetings × 500ms + 400ms wrapper fade ≈ 3.9s (under the 4s budget).
+const STANDARD_STEP_MS = 500
+const REDUCED_MOTION_STEP_MS = 380
+const STANDARD_EXIT_MS = 400
+const REDUCED_MOTION_EXIT_MS = 260
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+const EASE_IN: [number, number, number, number] = [0.64, 0, 0.78, 0]
+const EASE_INOUT: [number, number, number, number] = [0.65, 0, 0.35, 1]
 
 export function IntroLoader({ canExit, onExitStart, onComplete }: IntroLoaderProps) {
   const prefersReducedMotion = useReducedMotion()
@@ -58,29 +65,37 @@ export function IntroLoader({ canExit, onExitStart, onComplete }: IntroLoaderPro
 
   const activeGreeting = introGreetings[currentIndex]
 
+  const enterDuration = prefersReducedMotion ? 0.18 : 0.2
+  const exitDuration = prefersReducedMotion ? 0.14 : 0.18
+  const yOffset = prefersReducedMotion ? 0 : 12
+
   return (
     <motion.div
       className={`intro-loader${isExiting ? ' intro-loader--exiting' : ''}`}
       initial={false}
       animate={{ opacity: isExiting ? 0 : 1 }}
       transition={{
-        duration: prefersReducedMotion ? 0.18 : 0.32,
-        ease: [0.23, 1, 0.32, 1],
+        duration: isExiting ? exitMs / 1000 : 0.3,
+        ease: EASE_INOUT,
       }}
     >
       <div className="intro-loader__stage" aria-hidden="true">
-        <AnimatePresence initial={false} mode="sync">
+        <AnimatePresence mode="wait">
           <motion.p
             key={currentIndex}
             className="intro-loader__greeting"
             data-script={activeGreeting.script}
             dir={activeGreeting.dir}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: prefersReducedMotion ? 0.14 : 0.22,
-              ease: [0.23, 1, 0.32, 1],
+            initial={{ opacity: 0, y: yOffset }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: { duration: enterDuration, ease: EASE_OUT },
+            }}
+            exit={{
+              opacity: 0,
+              y: -yOffset,
+              transition: { duration: exitDuration, ease: EASE_IN },
             }}
           >
             {activeGreeting.greeting}

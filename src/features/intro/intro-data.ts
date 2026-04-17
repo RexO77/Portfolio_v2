@@ -4,12 +4,8 @@ export type IntroScript =
   | 'bengali'
   | 'telugu'
   | 'tamil'
-  | 'arabic'
-  | 'gujarati'
   | 'kannada'
   | 'malayalam'
-  | 'gurmukhi'
-  | 'oriya'
 
 export interface IntroGreeting {
   greeting: string
@@ -49,38 +45,8 @@ export const introGreetings: IntroGreeting[] = [
     script: 'bengali',
   },
   {
-    greeting: 'नमस्कार',
-    dir: 'ltr',
-    script: 'devanagari',
-  },
-  {
-    greeting: 'سلام',
-    dir: 'rtl',
-    script: 'arabic',
-  },
-  {
-    greeting: 'નમસ્તે',
-    dir: 'ltr',
-    script: 'gujarati',
-  },
-  {
     greeting: 'നമസ്കാരം',
     dir: 'ltr',
     script: 'malayalam',
-  },
-  {
-    greeting: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ',
-    dir: 'ltr',
-    script: 'gurmukhi',
-  },
-  {
-    greeting: 'ନମସ୍କାର',
-    dir: 'ltr',
-    script: 'oriya',
-  },
-  {
-    greeting: 'নমস্কাৰ',
-    dir: 'ltr',
-    script: 'bengali',
   },
 ]

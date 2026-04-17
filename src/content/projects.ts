@@ -4,6 +4,7 @@ export const featuredProjects: ProjectSummary[] = [
   {
     id: 'question-library',
     label: 'Case Study',
+    year: '2026',
     title: 'Question Library',
     description:
       'Replaced a flat question table with a skill-first explorer — cutting duplication, surfacing structure, and laying the foundation for AI-driven assessments.',
