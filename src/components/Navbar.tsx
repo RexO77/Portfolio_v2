@@ -17,6 +17,7 @@ import {
 import { connectEmail, connectLinks, navItems } from '@/content/site'
 import { useIntroState } from '@/features/intro/useIntroState'
 import { useCopyText } from '@/hooks/use-copy-text'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 
 const MOBILE_SOCIAL_ICONS: Record<string, React.ReactNode> = {
@@ -50,6 +51,7 @@ function NavbarContent() {
   const location = useLocation()
   const navigate = useNavigate()
   const shouldReduceMotion = useReducedMotion()
+  const isMobileViewport = useMediaQuery('(max-width: 900px)')
   const { introHandoffStarted, introComplete } = useIntroState()
   const activeItem = getActiveNavTarget(location.pathname, location.hash)
 
@@ -103,6 +105,23 @@ function NavbarContent() {
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isMobileOpen])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const mediaQueryList = window.matchMedia('(max-width: 900px)')
+    const handleBreakpointChange = (event: MediaQueryListEvent) => {
+      if (!event.matches) {
+        setIsMobileOpen(false)
+      }
+    }
+
+    mediaQueryList.addEventListener('change', handleBreakpointChange)
+
+    return () => mediaQueryList.removeEventListener('change', handleBreakpointChange)
+  }, [])
 
   const handleSkipToContent = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -166,7 +185,7 @@ function NavbarContent() {
         </div>
 
         <AnimatePresence>
-          {isMobileOpen && (
+          {isMobileViewport && isMobileOpen && (
             <motion.div
               id="mobile-navigation"
               role="navigation"

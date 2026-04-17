@@ -71,7 +71,7 @@ const UISoundProvider = () => {
         return
       }
 
-      const cue = target ? getDelegatedUISoundCue(target) : 'press'
+      const cue = target ? getDelegatedUISoundCue(target) : null
       if (!cue || cue === 'off') {
         return
       }
