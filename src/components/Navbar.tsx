@@ -17,6 +17,7 @@ import {
 import { connectEmail, connectLinks, navItems } from '@/content/site'
 import { useIntroState } from '@/features/intro/useIntroState'
 import { useCopyText } from '@/hooks/use-copy-text'
+import { useHaptics } from '@/hooks/use-haptics'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 
@@ -53,6 +54,7 @@ function NavbarContent() {
   const shouldReduceMotion = useReducedMotion()
   const isMobileViewport = useMediaQuery('(max-width: 900px)')
   const { introHandoffStarted, introComplete } = useIntroState()
+  const { haptic } = useHaptics()
   const activeItem = getActiveNavTarget(location.pathname, location.hash)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
@@ -149,7 +151,13 @@ function NavbarContent() {
         )}
       >
         <div className="navbar__shell">
-          <Link to="/" className="navbar__brand">
+          <Link
+            to="/"
+            className="navbar__brand"
+            onClick={() => {
+              haptic('nav')
+            }}
+          >
             <span className="navbar__logo">Nischal Skanda</span>
           </Link>
 
@@ -170,7 +178,10 @@ function NavbarContent() {
             <button
               type="button"
               className="navbar__mobile-toggle"
-              onClick={() => setIsMobileOpen((v) => !v)}
+              onClick={() => {
+                haptic(isMobileOpen ? 'menu-close' : 'menu-open')
+                setIsMobileOpen((v) => !v)
+              }}
               aria-expanded={isMobileOpen}
               aria-controls="mobile-navigation"
               aria-label={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
@@ -202,6 +213,7 @@ function NavbarContent() {
                           className="navbar__mobile-link"
                           onClick={(event) => {
                             event.preventDefault()
+                            haptic('nav')
                             setIsMobileOpen(false)
                             handleSelect(item)
                           }}
@@ -221,8 +233,11 @@ function NavbarContent() {
                         'navbar__mobile-email',
                         emailCopied && 'navbar__mobile-email--copied',
                       )}
-                      onClick={() => {
-                        void copyEmail()
+                      onClick={async () => {
+                        const didCopy = await copyEmail()
+                        if (didCopy) {
+                          haptic('success')
+                        }
                       }}
                       data-sound={emailCopied ? 'success' : 'press'}
                     >
@@ -249,7 +264,10 @@ function NavbarContent() {
                               href={link.href}
                               target="_blank"
                               rel="noopener noreferrer"
-                              onClick={() => setIsMobileOpen(false)}
+                              onClick={() => {
+                                haptic('click')
+                                setIsMobileOpen(false)
+                              }}
                               data-sound="press"
                             >
                               <span className="navbar__mobile-social-icon">

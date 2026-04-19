@@ -43,7 +43,7 @@ export function useCopyText(text: string, successDurationMs = 2000) {
 
     if (!didCopy) {
       resetCopied()
-      return
+      return false
     }
 
     resetCopied()
@@ -52,6 +52,7 @@ export function useCopyText(text: string, successDurationMs = 2000) {
       resetTimeoutRef.current = null
       setCopied(false)
     }, successDurationMs)
+    return true
   }, [resetCopied, successDurationMs, text])
 
   useEffect(() => {

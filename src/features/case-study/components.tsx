@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'motion/react'
 import NumberTicker from '@/components/fancy/NumberTicker'
+import { useHaptics } from '@/hooks/use-haptics'
 import type { CaseStudyContent, CaseStudyImage } from '@/types/content'
 
 const caseStudySmoothEase = [0.4, 0, 0.2, 1] as const
@@ -266,7 +267,7 @@ interface PasswordGateProps {
   password: string
   isWrong: boolean
   onPasswordChange: (password: string) => void
-  onUnlock: () => void
+  onUnlock: () => 'success' | 'error' | 'off'
 }
 
 export function PasswordGate({
@@ -276,6 +277,8 @@ export function PasswordGate({
   onPasswordChange,
   onUnlock,
 }: PasswordGateProps) {
+  const { haptic } = useHaptics()
+
   return (
     <div className="case-study__gate">
       <div className="case-study__gate-gradient" />
@@ -299,7 +302,13 @@ export function PasswordGate({
             isWrong ? ' case-study__gate-input--error' : ''
           }`}
         />
-        <button type="button" onClick={onUnlock} className="case-study__gate-btn">
+        <button
+          type="button"
+          onClick={() => {
+            haptic(onUnlock())
+          }}
+          className="case-study__gate-btn"
+        >
           {gate.buttonLabel}
         </button>
       </div>

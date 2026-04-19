@@ -15,6 +15,7 @@ import {
   ReframePanels,
   StatsSection,
 } from '@/features/case-study/components'
+import { useHaptics } from '@/hooks/use-haptics'
 import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 import '@/styles/case-study.css'
 
@@ -49,6 +50,7 @@ export default function QuestionLibraryCaseStudy() {
   const [password, setPassword] = useState('')
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [isWrong, setIsWrong] = useState(false)
+  const { haptic } = useHaptics()
 
   useStartupRouteReady()
 
@@ -56,12 +58,15 @@ export default function QuestionLibraryCaseStudy() {
     if (password.trim().toLowerCase() === caseStudy.gate.password) {
       setIsUnlocked(true)
       setIsWrong(false)
-      return
+      return 'success' as const
     }
 
     if (password.length > 0) {
       setIsWrong(true)
+      return 'error' as const
     }
+
+    return 'off' as const
   }
 
   const tocSections = useMemo<DynamicScrollIslandSection[]>(
@@ -99,7 +104,13 @@ export default function QuestionLibraryCaseStudy() {
         className="case-study__section case-study__section--hero case-study__nav-target"
       >
         <motion.div {...caseStudyRevealProps}>
-          <Link to="/#work" className="case-study__back">
+          <Link
+            to="/#work"
+            className="case-study__back"
+            onClick={() => {
+              haptic('nav')
+            }}
+          >
             <ArrowLeft /> {caseStudy.hero.backLabel}
           </Link>
 
@@ -341,12 +352,21 @@ export default function QuestionLibraryCaseStudy() {
         <div className="case-study__cta">
           <p className="case-study__cta-heading">{caseStudy.cta.heading}</p>
           <div className="case-study__cta-buttons">
-            <Link to={caseStudy.cta.primaryTo} className="case-study__cta-primary">
+            <Link
+              to={caseStudy.cta.primaryTo}
+              className="case-study__cta-primary"
+              onClick={() => {
+                haptic('primary')
+              }}
+            >
               {caseStudy.cta.primaryLabel}
             </Link>
             <a
               href={caseStudy.cta.secondaryHref}
               className="case-study__cta-secondary"
+              onClick={() => {
+                haptic('click')
+              }}
             >
               {caseStudy.cta.secondaryLabel}
             </a>

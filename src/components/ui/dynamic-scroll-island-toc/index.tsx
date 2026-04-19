@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useHaptics } from '@/hooks/use-haptics'
 import {
   AnimatePresence,
   MotionConfig,
@@ -69,6 +70,7 @@ export default function DynamicScrollIslandTOC({
   const [activeId, setActiveId] = useState<string | null>(sections[0]?.id ?? null)
   const progress = useMotionValue(0)
   const shouldReduceMotion = useReducedMotion()
+  const { haptic } = useHaptics()
   const resolvedActiveId = useMemo(
     () =>
       sections.some((section) => section.id === activeId)
@@ -85,6 +87,8 @@ export default function DynamicScrollIslandTOC({
 
   const scrollToSection = useCallback(
     (section: DynamicScrollIslandSection) => {
+      haptic('tab')
+
       const container = getContainer(containerRef, containerSelector)
       const target =
         typeof document !== 'undefined' ? document.getElementById(section.id) : null
@@ -106,7 +110,7 @@ export default function DynamicScrollIslandTOC({
       setActiveId(section.id)
       setOpen(false)
     },
-    [containerRef, containerSelector, scrollOffset, shouldReduceMotion],
+    [containerRef, containerSelector, haptic, scrollOffset, shouldReduceMotion],
   )
 
   useEffect(() => {
@@ -231,7 +235,10 @@ export default function DynamicScrollIslandTOC({
             <motion.button
               type="button"
               aria-label="Close section navigator"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                haptic('menu-close')
+                setOpen(false)
+              }}
               className="pointer-events-auto fixed inset-0 bg-d-fg/12 backdrop-blur-[4px]"
               initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
               animate={{ opacity: 1, backdropFilter: 'blur(4px)' }}
@@ -258,7 +265,12 @@ export default function DynamicScrollIslandTOC({
                       layoutIdPrefix={layoutIdPrefix}
                     />
                   </div>
-                  <CloseButton onClick={() => setOpen(false)} />
+                  <CloseButton
+                    onClick={() => {
+                      haptic('menu-close')
+                      setOpen(false)
+                    }}
+                  />
                 </div>
 
                 <motion.div
@@ -280,7 +292,10 @@ export default function DynamicScrollIslandTOC({
                 layoutId={`${layoutIdPrefix}-${shellKey}`}
                 style={{ borderRadius: 28 }}
                 className="flex w-[var(--toc-width)] items-center gap-3 overflow-hidden border border-d-bg/10 bg-d-fg/96 px-3 py-2 text-d-bg shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl"
-                onClick={() => setOpen(true)}
+                onClick={() => {
+                  haptic('menu-open')
+                  setOpen(true)
+                }}
                 aria-label="Open section navigator"
               >
                 <div className="min-w-0 flex-1">

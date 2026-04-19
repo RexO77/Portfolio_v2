@@ -21,6 +21,7 @@ import {
 } from '@/components/icons'
 import { connectEmail, connectLinks, type ConnectLink } from '@/content/site'
 import { useCopyText } from '@/hooks/use-copy-text'
+import { useHaptics } from '@/hooks/use-haptics'
 import { cn } from '@/lib/utils'
 
 interface ConnectDropdownProps {
@@ -43,6 +44,7 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const closeTimeoutRef = useRef<number | null>(null)
+  const { haptic } = useHaptics()
   const { copied: emailCopied, copy: copyEmail, resetCopied } = useCopyText(connectEmail)
 
   const clearTimeoutRef = (timeoutRef: MutableRefObject<number | null>) => {
@@ -66,9 +68,15 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
   }, [resetCopyState])
 
   const handleOptionClick = useCallback(
-    (option: ConnectLink) => {
+    async (option: ConnectLink) => {
       if (option.kind === 'copy-email') {
-        void copyEmail()
+        const didCopy = await copyEmail()
+        if (!didCopy) {
+          closeMenu()
+          return
+        }
+
+        haptic('success')
         clearTimeoutRef(closeTimeoutRef)
         closeTimeoutRef.current = window.setTimeout(() => {
           closeTimeoutRef.current = null
@@ -76,9 +84,11 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
         }, 1500)
         return
       }
+
+      haptic('click')
       closeMenu()
     },
-    [closeMenu, copyEmail],
+    [closeMenu, copyEmail, haptic],
   )
 
   useEffect(() => {
@@ -135,11 +145,13 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
         )}
         onClick={() => {
           if (isOpen) {
+            haptic('menu-close')
             closeMenu()
             return
           }
 
           resetCopyState()
+          haptic('menu-open')
           setIsOpen(true)
         }}
         aria-expanded={isOpen}
@@ -189,7 +201,9 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
                           'navbar__connect-item',
                           showCopied && 'navbar__connect-item--copied',
                         )}
-                        onClick={() => handleOptionClick(option)}
+                        onClick={() => {
+                          void handleOptionClick(option)
+                        }}
                       >
                         <span className="navbar__connect-icon">
                           {showCopied ? <Check className="h-4 w-4" /> : icon}
@@ -220,7 +234,9 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="navbar__connect-item"
-                      onClick={() => handleOptionClick(option)}
+                      onClick={() => {
+                        void handleOptionClick(option)
+                      }}
                     >
                       <span className="navbar__connect-icon">
                         {icon}

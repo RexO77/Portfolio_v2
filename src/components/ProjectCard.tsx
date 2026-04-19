@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useStartupAsset } from '@/features/intro/useStartupAsset'
+import { useHaptics } from '@/hooks/use-haptics'
 
 interface ProjectCardProps {
   videoSrc?: string
@@ -25,6 +26,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const imageRef = useRef<HTMLImageElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const { haptic } = useHaptics()
   const settleStartupAsset = useStartupAsset(
     trackIntroLoad && Boolean(videoSrc || imageSrc),
   )
@@ -100,6 +102,9 @@ export function ProjectCard({
     <Link
       to={to}
       className="project-card project-card--link"
+      onClick={() => {
+        haptic('nav')
+      }}
     >
       {body}
     </Link>
