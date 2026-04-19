@@ -11,8 +11,8 @@ import memory08 from '@/assets/life/memory-08.webp'
 import memory09 from '@/assets/life/memory-09.webp'
 
 export const lifePageContent: LifePageContent = {
-  titleLead: 'all your',
-  titleEmphasis: 'memories.',
+  titleLead: 'beyond',
+  titleEmphasis: 'the work.',
   photos: [
     {
       src: memory01,
