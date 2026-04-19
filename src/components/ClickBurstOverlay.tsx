@@ -106,7 +106,9 @@ const ClickBurstOverlay = () => {
         spawnBurst(event.clientX, event.clientY)
       }
 
-      void playUISound('press')
+      if (event.pointerType !== 'touch') {
+        void playUISound('press')
+      }
     }
 
     const handleClick = (event: MouseEvent) => {
