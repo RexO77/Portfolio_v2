@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { playUISound } from '@/lib/ui-sound'
 
 const BURST_LINE_COUNT = 3
 const BURST_ANIMATION_MS = 460
@@ -25,6 +26,15 @@ const isTextEditingTarget = (element: Element) => {
 
 const isOptedOutTarget = (element: Element) => {
   return Boolean(element.closest('[data-click-burst="off"]'))
+}
+
+const clearSelection = () => {
+  const selection = window.getSelection()
+  if (!selection || selection.isCollapsed) {
+    return
+  }
+
+  selection.removeAllRanges()
 }
 
 const spawnBurst = (x: number, y: number) => {
@@ -81,10 +91,6 @@ const ClickBurstOverlay = () => {
         return
       }
 
-      if (reducedMotionQuery.matches) {
-        return
-      }
-
       const target = event.target
       if (target instanceof Element) {
         if (
@@ -96,12 +102,39 @@ const ClickBurstOverlay = () => {
         }
       }
 
-      spawnBurst(event.clientX, event.clientY)
+      if (!reducedMotionQuery.matches) {
+        spawnBurst(event.clientX, event.clientY)
+      }
+
+      void playUISound('press')
+    }
+
+    const handleClick = (event: MouseEvent) => {
+      if (event.button !== 0 || event.defaultPrevented) {
+        return
+      }
+
+      const target = event.target
+      if (!(target instanceof Element)) {
+        return
+      }
+
+      if (
+        isInteractiveTarget(target) ||
+        isTextEditingTarget(target) ||
+        isOptedOutTarget(target)
+      ) {
+        return
+      }
+
+      clearSelection()
     }
 
     document.addEventListener('pointerdown', handlePointerDown, true)
+    document.addEventListener('click', handleClick, true)
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown, true)
+      document.removeEventListener('click', handleClick, true)
     }
   }, [])
 

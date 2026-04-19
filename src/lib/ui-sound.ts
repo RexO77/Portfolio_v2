@@ -16,38 +16,43 @@ interface CueConfig {
   throttleMs: number
 }
 
+interface NavigationIntent {
+  playedOnStart: boolean
+  route: string
+}
+
 const CUE_CONFIGS: Record<PlayableUISoundCue, CueConfig> = {
   press: {
     src: GLOBAL_UI_CLICK_SRC,
-    gain: 0.11,
+    gain: 0.22,
     playbackRate: 1,
     playbackRateJitter: 0,
     throttleMs: 40,
   },
   nav: {
     src: GLOBAL_UI_CLICK_SRC,
-    gain: 0.11,
+    gain: 0.22,
     playbackRate: 1,
     playbackRateJitter: 0,
     throttleMs: 40,
   },
   open: {
     src: GLOBAL_UI_CLICK_SRC,
-    gain: 0.11,
+    gain: 0.22,
     playbackRate: 1,
     playbackRateJitter: 0,
     throttleMs: 40,
   },
   close: {
     src: GLOBAL_UI_CLICK_SRC,
-    gain: 0.11,
+    gain: 0.22,
     playbackRate: 1,
     playbackRateJitter: 0,
     throttleMs: 40,
   },
   success: {
     src: GLOBAL_UI_CLICK_SRC,
-    gain: 0.11,
+    gain: 0.22,
     playbackRate: 1,
     playbackRateJitter: 0,
     throttleMs: 40,
@@ -67,17 +72,21 @@ const isBrowser = typeof window !== 'undefined'
 class UISoundEngine {
   private arrayBuffers = new Map<string, Promise<ArrayBuffer>>()
 
+  private audioFallbackPool = new Map<string, HTMLAudioElement[]>()
+
   private audioContext: AudioContext | null = null
 
   private audioContextCtor: AudioContextCtor | null = null
 
   private buffers = new Map<string, Promise<AudioBuffer>>()
 
+  private decodedBuffers = new Map<string, AudioBuffer>()
+
   private lastPlayedAt = new Map<PlayableUISoundCue, number>()
 
   private navigationIntentExpiresAt = 0
 
-  private pendingNavigationRoute: string | null = null
+  private pendingNavigationIntent: NavigationIntent | null = null
 
   private lastRequestedAt = 0
 
@@ -93,12 +102,11 @@ class UISoundEngine {
   }
 
   prime() {
-    if (!this.isSupported()) {
-      return
-    }
-
     PLAYABLE_UI_SOUND_CUES.forEach((cue) => {
-      void this.fetchArrayBuffer(cue).catch(() => {})
+      this.primeFallback(cue)
+      if (this.isSupported()) {
+        void this.decodeBuffer(cue).catch(() => {})
+      }
     })
   }
 
@@ -132,21 +140,28 @@ class UISoundEngine {
   }
 
   async play(cue: UISoundCue) {
-    if (!this.isSupported() || cue === 'off' || document.hidden) {
+    if (cue === 'off' || document.hidden) {
       return
     }
 
     this.lastRequestedAt = performance.now()
 
+    if (!this.isSupported()) {
+      void this.playFallback(cue)
+      return
+    }
+
     if (!this.unlocked) {
       const unlocked = await this.unlock()
       if (!unlocked) {
+        void this.playFallback(cue)
         return
       }
     }
 
     const context = this.getAudioContext()
     if (!context) {
+      void this.playFallback(cue)
       return
     }
 
@@ -154,11 +169,13 @@ class UISoundEngine {
       try {
         await context.resume()
       } catch {
+        void this.playFallback(cue)
         return
       }
     }
 
     if (context.state !== 'running') {
+      void this.playFallback(cue)
       return
     }
 
@@ -171,8 +188,14 @@ class UISoundEngine {
 
     this.lastPlayedAt.set(cue, now)
 
+    const readyBuffer = this.decodedBuffers.get(config.src)
+    if (!readyBuffer) {
+      void this.decodeBuffer(cue).catch(() => {})
+      void this.playFallback(cue)
+      return
+    }
+
     try {
-      const buffer = await this.decodeBuffer(cue)
       if (document.hidden) {
         return
       }
@@ -180,7 +203,7 @@ class UISoundEngine {
       const source = context.createBufferSource()
       const gainNode = context.createGain()
 
-      source.buffer = buffer
+      source.buffer = readyBuffer
       source.playbackRate.value = config.playbackRate + this.getJitter(config.playbackRateJitter)
       gainNode.gain.value = Math.max(0, config.gain + this.getJitter(0.01))
 
@@ -196,16 +219,19 @@ class UISoundEngine {
         { once: true },
       )
     } catch {
-      // Fail silently so interaction behavior is never blocked by audio.
+      void this.playFallback(cue)
     }
   }
 
-  markNavigationIntent(route: string) {
+  markNavigationIntent(route: string, playedOnStart = false) {
     if (!this.isSupported()) {
       return
     }
 
-    this.pendingNavigationRoute = route
+    this.pendingNavigationIntent = {
+      route,
+      playedOnStart,
+    }
     this.navigationIntentExpiresAt = performance.now() + INTERNAL_NAVIGATION_INTENT_TTL_MS
   }
 
@@ -214,16 +240,17 @@ class UISoundEngine {
       return false
     }
 
+    const intent = this.pendingNavigationIntent
     const hasIntent =
       performance.now() <= this.navigationIntentExpiresAt
-      && this.pendingNavigationRoute === currentRoute
+      && intent?.route === currentRoute
 
     if (hasIntent || performance.now() > this.navigationIntentExpiresAt) {
       this.navigationIntentExpiresAt = 0
-      this.pendingNavigationRoute = null
+      this.pendingNavigationIntent = null
     }
 
-    return hasIntent
+    return hasIntent ? !intent?.playedOnStart : false
   }
 
   getLastRequestedAt() {
@@ -232,6 +259,11 @@ class UISoundEngine {
 
   private async decodeBuffer(cue: PlayableUISoundCue) {
     const src = CUE_CONFIGS[cue].src
+    const existingBuffer = this.decodedBuffers.get(src)
+    if (existingBuffer) {
+      return existingBuffer
+    }
+
     const existingPromise = this.buffers.get(src)
     if (existingPromise) {
       return existingPromise
@@ -243,10 +275,19 @@ class UISoundEngine {
         throw new Error('Audio context unavailable')
       }
 
-      return context.decodeAudioData(arrayBuffer.slice(0))
+      const decodedBuffer = await context.decodeAudioData(arrayBuffer.slice(0))
+      this.decodedBuffers.set(src, decodedBuffer)
+      return decodedBuffer
     })
 
-    this.buffers.set(src, decodePromise)
+    this.buffers.set(
+      src,
+      decodePromise.catch((error) => {
+        this.buffers.delete(src)
+        throw error
+      }),
+    )
+
     return decodePromise
   }
 
@@ -257,13 +298,18 @@ class UISoundEngine {
       return existingPromise
     }
 
-    const fetchPromise = fetch(src).then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`Unable to load sound cue: ${cue}`)
-      }
+    const fetchPromise = fetch(src)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Unable to load sound cue: ${cue}`)
+        }
 
-      return response.arrayBuffer()
-    })
+        return response.arrayBuffer()
+      })
+      .catch((error) => {
+        this.arrayBuffers.delete(src)
+        throw error
+      })
 
     this.arrayBuffers.set(src, fetchPromise)
     return fetchPromise
@@ -287,6 +333,45 @@ class UISoundEngine {
 
   private isSupported() {
     return UI_SOUND_ENABLED && isBrowser && this.audioContextCtor !== null
+  }
+
+  private primeFallback(cue: PlayableUISoundCue) {
+    const src = CUE_CONFIGS[cue].src
+    if (this.audioFallbackPool.has(src) || typeof Audio === 'undefined') {
+      return
+    }
+
+    const audio = new Audio(src)
+    audio.preload = 'auto'
+    audio.load()
+    this.audioFallbackPool.set(src, [audio])
+  }
+
+  private async playFallback(cue: PlayableUISoundCue) {
+    if (!UI_SOUND_ENABLED || typeof Audio === 'undefined') {
+      return
+    }
+
+    const config = CUE_CONFIGS[cue]
+    const src = config.src
+    const pooled = this.audioFallbackPool.get(src) ?? []
+    const reusableAudio = pooled.find((audio) => audio.paused || audio.ended)
+    const audio = reusableAudio ?? new Audio(src)
+
+    if (!reusableAudio) {
+      pooled.push(audio)
+      this.audioFallbackPool.set(src, pooled)
+    }
+
+    audio.currentTime = 0
+    audio.volume = Math.min(1, Math.max(0, config.gain * 2.4))
+    audio.playbackRate = config.playbackRate
+
+    try {
+      await audio.play()
+    } catch {
+      // Fail silently so interaction behavior is never blocked by audio.
+    }
   }
 }
 
@@ -404,6 +489,10 @@ export const getInternalNavigationRoute = (
 
 export const markUISoundNavigationIntent = (route: string) => {
   uiSoundEngine.markNavigationIntent(route)
+}
+
+export const markUISoundNavigationIntentFromStart = (route: string) => {
+  uiSoundEngine.markNavigationIntent(route, true)
 }
 
 export const consumeUISoundNavigationIntent = (currentRoute: string) => {

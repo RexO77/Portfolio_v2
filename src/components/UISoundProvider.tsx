@@ -9,6 +9,7 @@ import {
   getLastUISoundRequestAt,
   isDisabledUISoundTarget,
   markUISoundNavigationIntent,
+  markUISoundNavigationIntentFromStart,
   playUISound,
   primeUISounds,
   unlockUISounds,
@@ -36,12 +37,30 @@ const isKeyboardActivation = (event: KeyboardEvent, element: HTMLElement) => {
 const UISoundProvider = () => {
   const location = useLocation()
   const lastRouteRef = useRef(`${location.pathname}${location.search}${location.hash}`)
+  const lastPointerDrivenTargetRef = useRef<HTMLElement | null>(null)
+  const lastPointerDrivenAtRef = useRef(0)
 
   useEffect(() => {
     primeUISounds()
   }, [])
 
   useEffect(() => {
+    const markPointerDrivenTarget = (target: HTMLElement | null) => {
+      lastPointerDrivenTargetRef.current = target
+      lastPointerDrivenAtRef.current = performance.now()
+    }
+
+    const isRecentPointerDrivenTarget = (target: HTMLElement | null) => {
+      if (!target) {
+        return false
+      }
+
+      return (
+        lastPointerDrivenTargetRef.current === target
+        && performance.now() - lastPointerDrivenAtRef.current < 450
+      )
+    }
+
     const handlePointerDown = (event: PointerEvent) => {
       if (event.button !== 0 || event.defaultPrevented) {
         return
@@ -52,7 +71,31 @@ const UISoundProvider = () => {
         return
       }
 
+      markPointerDrivenTarget(target)
       void unlockUISounds()
+
+      if (!target) {
+        return
+      }
+
+      const navigationRoute = getInternalNavigationRoute(target, event)
+      if (navigationRoute) {
+        markUISoundNavigationIntentFromStart(navigationRoute)
+        void playUISound('nav')
+        return
+      }
+
+      const cue = getDelegatedUISoundCue(target)
+      if (!cue || cue === 'off') {
+        return
+      }
+
+      const lastRequestedAt = getLastUISoundRequestAt()
+      if (cue === 'press' && performance.now() - lastRequestedAt < RECENT_SOUND_REQUEST_WINDOW_MS) {
+        return
+      }
+
+      void playUISound(cue)
     }
 
     const handleClick = (event: MouseEvent) => {
@@ -62,6 +105,10 @@ const UISoundProvider = () => {
 
       const target = getClosestUISoundTarget(event.target)
       if (target && isDisabledUISoundTarget(target)) {
+        return
+      }
+
+      if (isRecentPointerDrivenTarget(target)) {
         return
       }
 
@@ -76,18 +123,7 @@ const UISoundProvider = () => {
         return
       }
 
-      const lastRequestedAt = getLastUISoundRequestAt()
-      if (cue === 'press' && performance.now() - lastRequestedAt < RECENT_SOUND_REQUEST_WINDOW_MS) {
-        return
-      }
-
-      queueMicrotask(() => {
-        if (getLastUISoundRequestAt() > lastRequestedAt) {
-          return
-        }
-
-        void playUISound(cue)
-      })
+      void playUISound(cue)
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -104,7 +140,8 @@ const UISoundProvider = () => {
 
       const navigationRoute = getInternalNavigationRoute(target, event)
       if (navigationRoute) {
-        markUISoundNavigationIntent(navigationRoute)
+        markUISoundNavigationIntentFromStart(navigationRoute)
+        void playUISound('nav')
         return
       }
 
