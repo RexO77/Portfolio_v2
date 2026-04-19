@@ -26,11 +26,10 @@
 .life-page__stage::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
-  background: linear-gradient(to bottom, transparent, var(--color-bg) 90%);
+  inset: 0;
+  background:
+    linear-gradient(to bottom, var(--color-bg) 0%, transparent 10%, transparent 90%, var(--color-bg) 100%),
+    linear-gradient(to right,  var(--color-bg) 0%, transparent 10%, transparent 90%, var(--color-bg) 100%);
   pointer-events: none;
   z-index: 10;
 }

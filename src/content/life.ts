@@ -60,7 +60,7 @@ export const lifePageContent: LifePageContent = {
       src: memory07,
       alt: 'Memory 7',
       left: '16%',
-      top: '72%',
+      top: '74%',
       z: 3,
     },
     {
