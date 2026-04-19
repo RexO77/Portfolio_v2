@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { DiscoverNav } from '@/components/ui/discover-nav'
@@ -54,6 +54,7 @@ function NavbarContent() {
   const isMobileViewport = useMediaQuery('(max-width: 900px)')
   const { introHandoffStarted, introComplete } = useIntroState()
   const activeItem = getActiveNavTarget(location.pathname, location.hash)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   const [isMobileMenuRequested, setIsMobileOpen] = useState(false)
   const isMobileOpen = isMobileMenuRequested && isMobileViewport
@@ -100,11 +101,24 @@ function NavbarContent() {
 
   useEffect(() => {
     if (!isMobileOpen) return
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setIsMobileOpen(false)
     }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!mobileMenuRef.current?.contains(event.target as Node)) {
+        setIsMobileOpen(false)
+      }
+    }
+
     document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
+    document.addEventListener('pointerdown', handlePointerDown, true)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.removeEventListener('pointerdown', handlePointerDown, true)
+    }
   }, [isMobileOpen])
 
   const handleSkipToContent = useCallback(() => {
@@ -152,103 +166,107 @@ function NavbarContent() {
             <ConnectDropdown />
           </div>
 
-          <button
-            type="button"
-            className="navbar__mobile-toggle"
-            onClick={() => setIsMobileOpen((v) => !v)}
-            aria-expanded={isMobileOpen}
-            aria-controls="mobile-navigation"
-            aria-label={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          >
-            {isMobileOpen ? (
-              <CloseIcon className="h-5 w-5" />
-            ) : (
-              <MenuIcon className="h-5 w-5" />
-            )}
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {isMobileViewport && isMobileOpen && (
-            <motion.div
-              id="mobile-navigation"
-              role="navigation"
-              aria-label="Mobile navigation"
-              className="navbar__mobile-panel"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={mobilePanelTransition}
+          <div ref={mobileMenuRef} className="navbar__mobile-menu">
+            <button
+              type="button"
+              className="navbar__mobile-toggle"
+              onClick={() => setIsMobileOpen((v) => !v)}
+              aria-expanded={isMobileOpen}
+              aria-controls="mobile-navigation"
+              aria-label={isMobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              data-sound={isMobileOpen ? 'close' : 'open'}
             >
-              <ul className="navbar__mobile-list">
-                {navItems.map((item) => (
-                  <li key={item.to}>
-                    <a
-                      href={item.to}
-                      className="navbar__mobile-link"
-                      onClick={(event) => {
-                        event.preventDefault()
-                        setIsMobileOpen(false)
-                        handleSelect(item)
-                      }}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              {isMobileOpen ? (
+                <CloseIcon className="h-5 w-5" />
+              ) : (
+                <MenuIcon className="h-5 w-5" />
+              )}
+            </button>
 
-              <div className="navbar__mobile-connect">
-                <p className="navbar__mobile-connect-label">Connect with me</p>
-
-                <button
-                  type="button"
-                  className={cn(
-                    'navbar__mobile-email',
-                    emailCopied && 'navbar__mobile-email--copied',
-                  )}
-                  onClick={() => {
-                    void copyEmail()
-                  }}
+            <AnimatePresence>
+              {isMobileViewport && isMobileOpen && (
+                <motion.section
+                  id="mobile-navigation"
+                  className="navbar__mobile-popover"
+                  aria-label="Mobile navigation"
+                  initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={mobilePanelTransition}
                 >
-                  {emailCopied ? (
-                    <>
-                      <Check className="h-4 w-4" />
-                      <span>Email copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="h-4 w-4" />
-                      <span>Copy email</span>
-                    </>
-                  )}
-                </button>
-
-                <ul className="navbar__mobile-socials">
-                  {connectLinks
-                    .filter((link) => link.kind === 'external')
-                    .map((link) => (
-                      <li key={link.key}>
+                  <ul className="navbar__mobile-list">
+                    {navItems.map((item) => (
+                      <li key={item.to}>
                         <a
-                          className="navbar__mobile-social"
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setIsMobileOpen(false)}
+                          href={item.to}
+                          className="navbar__mobile-link"
+                          onClick={(event) => {
+                            event.preventDefault()
+                            setIsMobileOpen(false)
+                            handleSelect(item)
+                          }}
                         >
-                          <span className="navbar__mobile-social-icon">
-                            {MOBILE_SOCIAL_ICONS[link.key]}
-                          </span>
-                          <span>{link.label}</span>
-                          <ExternalLink className="ml-auto h-3 w-3 opacity-50" />
+                          {item.label}
                         </a>
                       </li>
                     ))}
-                </ul>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  </ul>
+
+                  <div className="navbar__mobile-connect">
+                    <p className="navbar__mobile-connect-label">Connect with me</p>
+
+                    <button
+                      type="button"
+                      className={cn(
+                        'navbar__mobile-email',
+                        emailCopied && 'navbar__mobile-email--copied',
+                      )}
+                      onClick={() => {
+                        void copyEmail()
+                      }}
+                      data-sound={emailCopied ? 'success' : 'press'}
+                    >
+                      {emailCopied ? (
+                        <>
+                          <Check className="h-4 w-4" />
+                          <span>Email copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="h-4 w-4" />
+                          <span>Copy email</span>
+                        </>
+                      )}
+                    </button>
+
+                    <ul className="navbar__mobile-socials">
+                      {connectLinks
+                        .filter((link) => link.kind === 'external')
+                        .map((link) => (
+                          <li key={link.key}>
+                            <a
+                              className="navbar__mobile-social"
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setIsMobileOpen(false)}
+                              data-sound="press"
+                            >
+                              <span className="navbar__mobile-social-icon">
+                                {MOBILE_SOCIAL_ICONS[link.key]}
+                              </span>
+                              <span>{link.label}</span>
+                              <ExternalLink className="ml-auto h-3 w-3 opacity-50" />
+                            </a>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                </motion.section>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </header>
     </>
   )
