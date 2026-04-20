@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { Navbar } from '@/components/Navbar'
 import DragElements from '@/components/fancy/blocks/drag-elements'
+import { BookCover } from '@/components/life/BookCover'
 import { lifePageContent } from '@/content/life'
 import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 import { useMediaQuery } from '@/hooks/use-media-query'
@@ -30,6 +31,26 @@ export default function LifePage() {
   )
 
   const { essay } = lifePageContent
+  const books = essay.books
+  const spotify = essay.spotify
+
+  useEffect(() => {
+    if (!books?.items.length) return
+
+    const preloads = books.items.flatMap((book) => {
+      const cover = new Image()
+      cover.src = book.src
+      const large = new Image()
+      if (book.largeSrc) large.src = book.largeSrc
+      return [cover, large]
+    })
+
+    return () => {
+      preloads.forEach((img) => {
+        img.src = ''
+      })
+    }
+  }, [books])
 
   return (
     <>
@@ -129,6 +150,58 @@ export default function LifePage() {
               </p>
             ))}
           </div>
+
+          {books && books.items.length > 0 && (
+            <section className="life-books" aria-labelledby="life-books-title">
+              <p id="life-books-title" className="life-books__eyebrow">
+                {books.eyebrow}
+              </p>
+
+              <div className="life-books__shelf">
+                {books.items.map((book, index) => {
+                  const rotation = index === 0 ? -3 : index === 1 ? 1.5 : 4
+                  return (
+                    <BookCover
+                      key={book.title}
+                      {...book}
+                      rotation={rotation}
+                      loading={index < 2 ? 'eager' : 'lazy'}
+                    />
+                  )
+                })}
+              </div>
+
+              <p className="life-books__caption">{books.caption}</p>
+            </section>
+          )}
+
+          {spotify && spotify.items.length > 0 && (
+            <section className="life-spotify" aria-labelledby="life-spotify-title">
+              <p id="life-spotify-title" className="life-spotify__eyebrow">
+                {spotify.eyebrow}
+              </p>
+
+              <div className="life-spotify__stack">
+                {spotify.items.map((playlist) => (
+                  <div key={playlist.embedUrl} className="life-spotify__card">
+                    <iframe
+                      src={playlist.embedUrl}
+                      title={playlist.title}
+                      width="100%"
+                      height="352"
+                      loading="lazy"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {spotify.caption && (
+                <p className="life-spotify__caption">{spotify.caption}</p>
+              )}
+            </section>
+          )}
 
           <p className="life-essay__signoff">{essay.signoff}</p>
         </section>

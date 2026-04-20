@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { ProjectCard } from '@/components/ProjectCard'
+import { ExperienceDial } from '@/components/work/ExperienceDial'
 import { homePageContent } from '@/content/home'
 import { featuredProjects } from '@/content/projects'
+import { workExperiences } from '@/content/work-experience'
 import { useIntroState } from '@/features/intro/useIntroState'
 import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
+import '@/styles/experience-dial.css'
 
 const CHAR_STAGGER = 0.022
 const BASE_DELAY = 0.08
@@ -75,9 +78,24 @@ export default function HomePage() {
             <ProjectCard key={project.id} {...project} trackIntroLoad />
           ))}
         </div>
+
+        <ExperienceSection />
+
         <div className="homepage__anchor" id="blog" aria-hidden="true" />
       </main>
     </>
+  )
+}
+
+function ExperienceSection() {
+  return (
+    <section
+      className="experience-section"
+      id="experience"
+      aria-label="Work experience"
+    >
+      <ExperienceDial items={workExperiences} />
+    </section>
   )
 }
 
