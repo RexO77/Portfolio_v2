@@ -1,14 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
+  type MotionStyle,
   useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
@@ -83,7 +77,7 @@ export function ExperienceDial({
   // Ruler bounds: snap to whole calendar years for clean labels + ticks.
   // Add 1 year of breathing room after the latest role so the range pill
   // never butts up against the ruler edge.
-  const { rulerStartYear, rulerEndYear, span } = useMemo(() => {
+  const { rulerStartYear, span } = useMemo(() => {
     const rStart = Math.min(...items.map((i) => i.startYear))
     // Always leave a full year of breathing room AFTER today (or the latest
     // endYear, whichever is greater) so the pointer never bumps the right
@@ -93,7 +87,7 @@ export function ExperienceDial({
       currentYear,
     )
     const rEnd = latestEnd + 1
-    return { rulerStartYear: rStart, rulerEndYear: rEnd, span: rEnd - rStart }
+    return { rulerStartYear: rStart, span: rEnd - rStart }
   }, [items, currentYear])
 
   const rulerWidth = span * pxPerYear
@@ -337,7 +331,7 @@ export function ExperienceDial({
           dragTransition={DRAG_TRANSITION}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}
-          style={{ x, width: rulerWidth } as CSSProperties}
+          style={{ x, width: rulerWidth } satisfies MotionStyle}
         >
           <motion.div
             className="experience-dial__range"
