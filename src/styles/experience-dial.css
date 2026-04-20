@@ -1,0 +1,452 @@
+/* ── Experience Section ───────────────────────────────
+   Stationary section on the home page. The dial inside
+   is a draggable chronological scrubber — no more scroll-pin.
+*/
+
+.experience-section {
+  position: relative;
+  padding-inline: var(--content-padding);
+  margin-top: clamp(64px, 9vw, 128px);
+  margin-bottom: clamp(80px, 10vw, 160px);
+  margin-inline: auto;
+  max-width: var(--content-width);
+  z-index: 1;
+}
+
+/* ── Experience Dial ───────────────────────────────────
+   Draggable dial: a giant serif company name above a
+   horizontal year ruler. The ruler glides horizontally
+   under a stationary pointer as the user drags it, and
+   the company/accent crossfades as the pointer crosses
+   into a new role's year span.
+*/
+
+.experience-dial {
+  --dial-fg: var(--color-text);
+  --dial-muted: var(--color-text-tertiary);
+  --dial-line: rgba(30, 30, 30, 0.16);
+  --dial-line-strong: rgba(30, 30, 30, 0.42);
+  --dial-accent: #e84d1a;
+  --dial-accent-soft: rgba(255, 150, 80, 0.4);
+
+  position: relative;
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(36px, 5vw, 72px);
+  isolation: isolate;
+}
+
+.experience-dial[data-accent='green'] {
+  --dial-accent: #4fb023;
+  --dial-accent-soft: rgba(125, 232, 63, 0.38);
+}
+
+.experience-dial[data-accent='yellow'] {
+  --dial-accent: #c98b0a;
+  --dial-accent-soft: rgba(248, 224, 55, 0.5);
+}
+
+.experience-dial[data-accent='blue'] {
+  --dial-accent: #2d7fe0;
+  --dial-accent-soft: rgba(85, 160, 251, 0.32);
+}
+
+.experience-dial[data-accent='orange'] {
+  --dial-accent: #e84d1a;
+  --dial-accent-soft: rgba(255, 150, 80, 0.4);
+}
+
+.experience-dial[data-accent='purple'] {
+  --dial-accent: #8b3fc0;
+  --dial-accent-soft: rgba(170, 110, 230, 0.38);
+}
+
+.experience-dial[data-accent='sand'] {
+  --dial-accent: #b8895a;
+  --dial-accent-soft: rgba(210, 170, 115, 0.36);
+}
+
+/* ── Eyebrow ─────────────────────────────────────────── */
+
+.experience-dial__eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 1.6vw, 24px);
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: clamp(11px, 0.85vw, 13px);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.22em;
+  color: var(--color-text);
+  text-transform: uppercase;
+}
+
+.experience-dial__eyebrow-text {
+  white-space: nowrap;
+}
+
+.experience-dial__rule {
+  display: block;
+  flex: 0 0 clamp(48px, 6vw, 96px);
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+/* ── Headline (glow + title + subtitle) ─────────────── */
+
+.experience-dial__headline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 1.8vw, 26px);
+  width: 100%;
+  padding-block: clamp(8px, 1.4vw, 20px);
+}
+
+.experience-dial__glow-stage {
+  position: absolute;
+  inset: -40% -5% -10%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.experience-dial__glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  filter: blur(70px) saturate(1.2);
+  border-radius: 50%;
+  transition: opacity var(--duration-slower) var(--ease-out);
+  will-change: opacity;
+}
+
+.experience-dial__glow[data-active='true'] {
+  opacity: 1;
+}
+
+.experience-dial__glow[data-accent='green'] {
+  background: radial-gradient(
+    ellipse 48% 56% at 50% 50%,
+    rgba(125, 232, 63, 0.7) 0%,
+    transparent 68%
+  );
+}
+
+.experience-dial__glow[data-accent='yellow'] {
+  background: radial-gradient(
+    ellipse 48% 56% at 50% 50%,
+    rgba(250, 220, 55, 0.8) 0%,
+    transparent 68%
+  );
+}
+
+.experience-dial__glow[data-accent='blue'] {
+  background: radial-gradient(
+    ellipse 48% 56% at 50% 50%,
+    rgba(85, 160, 251, 0.6) 0%,
+    transparent 68%
+  );
+}
+
+.experience-dial__glow[data-accent='orange'] {
+  background: radial-gradient(
+    ellipse 48% 56% at 50% 50%,
+    rgba(255, 160, 70, 0.7) 0%,
+    transparent 68%
+  );
+}
+
+.experience-dial__glow[data-accent='purple'] {
+  background: radial-gradient(
+    ellipse 48% 56% at 50% 50%,
+    rgba(180, 110, 240, 0.7) 0%,
+    transparent 68%
+  );
+}
+
+.experience-dial__glow[data-accent='sand'] {
+  background: radial-gradient(
+    ellipse 48% 56% at 50% 50%,
+    rgba(220, 175, 115, 0.6) 0%,
+    transparent 68%
+  );
+}
+
+.experience-dial__title-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(78px, 12vw, 200px);
+  overflow: visible;
+}
+
+.experience-dial__title {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: clamp(64px, 12vw, 200px);
+  font-weight: var(--weight-normal);
+  letter-spacing: -0.018em;
+  line-height: 0.95;
+  color: var(--color-text);
+  text-align: center;
+  white-space: nowrap;
+  will-change: transform, opacity, filter;
+}
+
+.experience-dial__role-stage {
+  position: relative;
+  width: 100%;
+  height: 1.5em;
+}
+
+.experience-dial__role {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.1vw, 16px);
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.22em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.experience-dial__role-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--dial-accent);
+  box-shadow: 0 0 12px var(--dial-accent);
+  opacity: 0.9;
+  transition: background var(--duration-slower) var(--ease-out);
+}
+
+/* ── Draggable dial viewport ─────────────────────────── */
+
+.experience-dial__viewport {
+  position: relative;
+  width: min(100%, 960px);
+  height: clamp(96px, 10vw, 140px);
+  margin-top: clamp(18px, 2.4vw, 32px);
+  /* Edge fade — the ruler dissolves into the cream bg
+     at the far ends so it feels endless. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 14%,
+    #000 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 14%,
+    #000 86%,
+    transparent 100%
+  );
+  touch-action: pan-y;
+  overflow: visible;
+}
+
+/* ── Stationary center pointer ──────────────────────── */
+
+.experience-dial__pointer {
+  position: absolute;
+  left: 50%;
+  top: clamp(22px, 2.6vw, 34px);
+  transform: translate3d(-50%, 0, 0);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--dial-accent);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(30, 30, 30, 0.18));
+  transition: color var(--duration-slower) var(--ease-out);
+}
+
+.experience-dial__pointer-arrow {
+  width: clamp(12px, 1.1vw, 16px);
+  height: clamp(9px, 0.9vw, 11px);
+}
+
+.experience-dial__pointer-stem {
+  display: block;
+  width: 1.5px;
+  height: clamp(26px, 2.8vw, 38px);
+  background: currentColor;
+  margin-top: 1px;
+  border-radius: 1px;
+  opacity: 0.9;
+}
+
+/* ── The draggable ruler itself ─────────────────────── */
+
+.experience-dial__ruler {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 100%;
+  cursor: grab;
+  user-select: none;
+  z-index: 1;
+  /* Ensure the ruler is translate-friendly for the
+     x motion value. The viewport masks the overflow
+     visually via mask-image. */
+  will-change: transform;
+}
+
+.experience-dial[data-dragging='true'] .experience-dial__ruler {
+  cursor: grabbing;
+}
+
+/* Years row (just inside the top of the ruler). */
+.experience-dial__years {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: clamp(22px, 2.4vw, 28px);
+  pointer-events: none;
+}
+
+.experience-dial__year {
+  position: absolute;
+  transform: translateX(-50%);
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.78vw, 12px);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.1em;
+  color: var(--dial-muted);
+  transition:
+    color var(--duration-slow) var(--ease-out),
+    opacity var(--duration-slow) var(--ease-out);
+}
+
+.experience-dial__year[data-type='month'] {
+  font-size: clamp(8px, 0.58vw, 9.5px);
+  letter-spacing: 0.18em;
+  opacity: 0.55;
+  top: 4px;
+}
+
+.experience-dial__year[data-active='true'] {
+  color: var(--color-text);
+}
+
+.experience-dial__year[data-type='month'][data-active='true'] {
+  color: var(--dial-accent);
+  opacity: 0.9;
+}
+
+/* Range highlight — soft accent pill covering the
+   active role's year span. Sits behind the ticks. */
+.experience-dial__range {
+  position: absolute;
+  top: clamp(30px, 3vw, 40px);
+  height: clamp(24px, 2.6vw, 32px);
+  border-radius: 999px;
+  background: var(--dial-accent-soft);
+  pointer-events: none;
+  will-change: left, width, background;
+  transition: background var(--duration-slower) var(--ease-out);
+}
+
+/* Ticks row. */
+.experience-dial__ticks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: clamp(30px, 3vw, 40px);
+  height: clamp(24px, 2.6vw, 32px);
+  pointer-events: none;
+}
+
+.experience-dial__tick {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 6px;
+  transform: translateX(-0.5px);
+  background: var(--dial-line);
+  border-radius: 1px;
+}
+
+.experience-dial__tick[data-mid='true'] {
+  height: 10px;
+  background: var(--dial-line);
+  opacity: 0.75;
+}
+
+.experience-dial__tick[data-major='true'] {
+  height: 16px;
+  width: 1.5px;
+  background: var(--dial-line-strong);
+}
+
+/* Accessible live region (visually hidden). */
+.experience-dial__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Narrow viewport — tighten typography but keep
+      the dial draggable (it's touch-native already). */
+@media (max-width: 720px) {
+  .experience-dial {
+    gap: clamp(24px, 6vw, 40px);
+  }
+
+  .experience-dial__title {
+    font-size: clamp(48px, 13vw, 88px);
+  }
+
+  .experience-dial__role {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+
+  .experience-dial__viewport {
+    width: 100%;
+  }
+}
+
+/* ── Reduced motion ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .experience-dial__glow,
+  .experience-dial__pointer,
+  .experience-dial__range,
+  .experience-dial__title,
+  .experience-dial__role {
+    transition: none !important;
+  }
+
+  .experience-dial__ruler {
+    cursor: default;
+  }
+}

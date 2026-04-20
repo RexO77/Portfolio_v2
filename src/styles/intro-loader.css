@@ -5,6 +5,13 @@
   place-items: center;
   background-color: var(--color-bg);
   z-index: var(--z-modal);
+  /* Isolate the intro into its own stacking + compositor context so the
+     AppRouter mounting underneath cannot jank the greeting transitions. */
+  isolation: isolate;
+  contain: layout paint style;
+  transform: translateZ(0);
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 
 .intro-loader--exiting {
@@ -18,6 +25,9 @@
   inset: 0;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
+  /* Keep the stage's paint scoped so overlapping greetings during the
+     crossfade don't trigger broader repaints. */
+  contain: layout paint;
 }
 
 .intro-loader__greeting {
@@ -31,7 +41,10 @@
   text-align: center;
   text-wrap: balance;
   padding-inline: 24px;
-  will-change: opacity, transform;
+  /* Hint to the compositor that opacity, transform AND filter all animate so
+     the browser can promote the layer up-front and avoid a first-frame jolt
+     when the blur engages on enter/exit. */
+  will-change: opacity, transform, filter;
   transform: translateZ(0);
   backface-visibility: hidden;
 }

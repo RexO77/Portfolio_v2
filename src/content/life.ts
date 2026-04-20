@@ -88,5 +88,47 @@ export const lifePageContent: LifePageContent = {
       "When I'm not designing, I'm usually obsessing over how things work on a granular level — funneling my deep dives into cognitive neuroscience into my Light Idea Labs blog, or just shitposting on X. Otherwise, you'll find me following the mechanics of Formula One, reading, or bringing my camera along on my travels. Fair warning: if I get excited about a flawless user flow or a genuinely great burrito, you will definitely know about it.",
     ],
     signoff: '— Nischal',
+    books: {
+      eyebrow: 'On the shelf',
+      caption:
+        'Books that shaped how I think about design, wealth, and the quiet work of becoming.',
+      items: [
+        {
+          title: 'The Almanack of Naval Ravikant',
+          author: 'Eric Jorgenson',
+          src: 'https://covers.openlibrary.org/b/isbn/9781544514215-M.jpg',
+          largeSrc: 'https://covers.openlibrary.org/b/isbn/9781544514215-L.jpg',
+        },
+        {
+          title: 'The Design of Everyday Things',
+          author: 'Don Norman',
+          src: 'https://covers.openlibrary.org/b/isbn/9780465050659-M.jpg',
+          largeSrc: 'https://covers.openlibrary.org/b/isbn/9780465050659-L.jpg',
+        },
+        {
+          title: 'The Mountain Is You',
+          author: 'Brianna Wiest',
+          src: 'https://covers.openlibrary.org/b/isbn/9781949759228-M.jpg',
+          largeSrc: 'https://covers.openlibrary.org/b/isbn/9781949759228-L.jpg',
+        },
+      ],
+    },
+    spotify: {
+      eyebrow: 'On repeat',
+      caption:
+        'What’s playing while I design, write, or stare at the ceiling.',
+      items: [
+        {
+          title: 'Daily Essentials',
+          embedUrl:
+            'https://open.spotify.com/embed/playlist/3kY9tt2OlSj35xmN6Tulxq?utm_source=generator',
+        },
+        {
+          title: 'Midnight Crash',
+          embedUrl:
+            'https://open.spotify.com/embed/playlist/6GRRlJpjRd4g48Vgb2j9Y7?utm_source=generator',
+        },
+      ],
+    },
   },
 }

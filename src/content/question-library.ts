@@ -2,7 +2,9 @@ import { featuredProjects } from '@/content/projects'
 import { siteMetadata } from '@/content/site'
 import type { CaseStudyContent } from '@/types/content'
 
-const summary = featuredProjects[0]
+const summary =
+  featuredProjects.find((project) => project.id === 'question-library') ??
+  featuredProjects[0]
 
 export const questionLibraryCaseStudy: CaseStudyContent = {
   summary,

@@ -7,17 +7,3 @@ export const discoverNavBubbleTransition = {
   mass: 0.85,
 } as const
 
-export const pageShellEnter = {
-  opacity: 0,
-  y: 18,
-} as const
-
-export const pageShellExit = {
-  opacity: 0,
-  y: -12,
-} as const
-
-export const pageShellTransition = {
-  duration: 0.22,
-  ease: uiEase,
-} as const

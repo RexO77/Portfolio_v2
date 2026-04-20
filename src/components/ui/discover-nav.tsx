@@ -5,7 +5,7 @@ import { discoverNavBubbleTransition } from '@/lib/motion'
 export interface DiscoverNavItem {
   label: string
   to: string
-  kind: 'section' | 'route'
+  kind: 'section' | 'route' | 'external'
 }
 
 interface DiscoverNavProps {
@@ -34,12 +34,14 @@ export function DiscoverNav({
       <div className="pointer-events-none absolute inset-px rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.68),rgba(255,255,255,0.1)_52%,rgba(125,232,63,0.1)_100%)]" />
 
       {items.map((item) => {
-        const isActive = item.to === activeItem
+        const isActive = item.kind !== 'external' && item.to === activeItem
 
         return (
           <a
             key={item.to}
             href={item.to}
+            target={item.kind === 'external' ? '_blank' : undefined}
+            rel={item.kind === 'external' ? 'noopener noreferrer' : undefined}
             onClick={(event) => {
               event.preventDefault()
               onSelect(item)

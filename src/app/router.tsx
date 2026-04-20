@@ -7,6 +7,9 @@ const LifePage = lazy(() => import('@/app/pages/LifePage'))
 const QuestionLibraryCaseStudy = lazy(
   () => import('@/app/pages/QuestionLibraryCaseStudy'),
 )
+const LoginRedesignCaseStudy = lazy(
+  () => import('@/app/pages/LoginRedesignCaseStudy'),
+)
 
 const router = createBrowserRouter([
   {
@@ -33,6 +36,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <QuestionLibraryCaseStudy />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/projects/login-redesign',
+        element: (
+          <Suspense>
+            <LoginRedesignCaseStudy />
           </Suspense>
         ),
       },

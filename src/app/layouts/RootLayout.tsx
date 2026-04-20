@@ -1,14 +1,9 @@
 import { useEffect, useRef } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
 import { useLocation, useOutlet } from 'react-router-dom'
 import ClickBurstOverlay from '@/components/ClickBurstOverlay'
 import UISoundProvider from '@/components/UISoundProvider'
 import { useIntroState } from '@/features/intro/useIntroState'
-import {
-  pageShellEnter,
-  pageShellExit,
-  pageShellTransition,
-} from '@/lib/motion'
 
 const HASH_SCROLL_MAX_ATTEMPTS = 40
 const HASH_SCROLL_RETRY_DELAY_MS = 50
@@ -18,8 +13,7 @@ export function RootLayout() {
   const outlet = useOutlet()
   const shouldReduceMotion = useReducedMotion()
   const scrollRootRef = useRef<HTMLDivElement>(null)
-  const { isIntroActive, introComplete } = useIntroState()
-  const shouldAnimateRouteShell = !isIntroActive && introComplete && !shouldReduceMotion
+  const { isIntroActive } = useIntroState()
 
   useEffect(() => {
     const scrollRoot = scrollRootRef.current
@@ -78,18 +72,7 @@ export function RootLayout() {
     >
       <UISoundProvider />
       <ClickBurstOverlay />
-      <AnimatePresence initial={false} mode="sync">
-        <motion.div
-          key={location.pathname}
-          className="route-shell"
-          initial={shouldAnimateRouteShell ? pageShellEnter : false}
-          animate={{ opacity: 1, y: 0 }}
-          exit={shouldAnimateRouteShell ? pageShellExit : { opacity: 1, y: 0 }}
-          transition={shouldAnimateRouteShell ? pageShellTransition : { duration: 0 }}
-        >
-          {outlet}
-        </motion.div>
-      </AnimatePresence>
+      <div className="route-shell">{outlet}</div>
     </div>
   )
 }

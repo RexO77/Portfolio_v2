@@ -3,11 +3,15 @@ import {
   Children,
   cloneElement,
   isValidElement,
+  useCallback,
   useRef,
+  useState,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from 'react'
+
+const Z_INDEX_BASE = 100
 
 type DragElementsProps = {
   children: ReactNode
@@ -42,6 +46,14 @@ export default function DragElements({
   dragMomentum = true,
 }: DragElementsProps) {
   const constraintsRef = useRef<HTMLDivElement>(null)
+  const zCounterRef = useRef(Z_INDEX_BASE)
+  const [topZIndices, setTopZIndices] = useState<Record<string, number>>({})
+
+  const bringToTop = useCallback((key: string) => {
+    zCounterRef.current += 1
+    const next = zCounterRef.current
+    setTopZIndices((prev) => ({ ...prev, [key]: next }))
+  }, [])
 
   return (
     <div
@@ -59,21 +71,25 @@ export default function DragElements({
 
         const el = child as ReactElement<{ style?: CSSProperties; className?: string }>
         const { outer, inner } = splitLayoutStyle(el.props.style)
+        const itemKey = String(el.key ?? index)
+        const stackedZ = topZIndices[itemKey]
+        const resolvedZ = stackedZ ?? outer.zIndex
 
         return (
           <motion.div
-            key={el.key ?? index}
+            key={itemKey}
             drag
             dragConstraints={constraintsRef}
             dragMomentum={dragMomentum}
             dragElastic={0.08}
+            onPointerDown={() => bringToTop(itemKey)}
             whileDrag={{
-              zIndex: 80,
               cursor: 'grabbing',
               scale: 1.02,
             }}
             style={{
               ...outer,
+              zIndex: resolvedZ,
               cursor: 'grab',
               touchAction: 'none',
             }}

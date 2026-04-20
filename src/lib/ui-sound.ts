@@ -223,6 +223,100 @@ class UISoundEngine {
     }
   }
 
+  /**
+   * Synthesises a short detent "tick" via Web Audio — a sine burst layered
+   * with a filtered noise transient. Unlike the sample-based cues this does
+   * not hit the network: each tick is composed live from oscillators so it
+   * can be pitch-shifted per detent for an organic, dial-like feel.
+   *
+   * Designed for high-frequency use (scrubbing). The caller is responsible
+   * for throttling — the engine will bail silently if audio is not yet
+   * unlocked so hot paths stay non-blocking.
+   */
+  playDialTick({
+    pitchCents = 0,
+    gain = 0.08,
+    strength = 'minor',
+  }: {
+    pitchCents?: number
+    gain?: number
+    strength?: 'minor' | 'major'
+  } = {}) {
+    if (!this.isSupported() || document.hidden) {
+      return
+    }
+
+    if (!this.unlocked) {
+      void this.unlock()
+      return
+    }
+
+    const context = this.getAudioContext()
+    if (!context || context.state !== 'running') {
+      return
+    }
+
+    const now = context.currentTime
+    const isMajor = strength === 'major'
+    const baseFreq = isMajor ? 1900 : 2600
+    const toneDuration = isMajor ? 0.055 : 0.035
+
+    try {
+      const master = context.createGain()
+      master.gain.value = 1
+      master.connect(context.destination)
+
+      const osc = context.createOscillator()
+      const oscGain = context.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = baseFreq * Math.pow(2, pitchCents / 1200)
+      oscGain.gain.setValueAtTime(0, now)
+      oscGain.gain.linearRampToValueAtTime(gain, now + 0.001)
+      oscGain.gain.exponentialRampToValueAtTime(0.0001, now + toneDuration)
+      osc.connect(oscGain)
+      oscGain.connect(master)
+
+      const transientLen = Math.max(1, Math.floor(context.sampleRate * 0.003))
+      const noiseBuffer = context.createBuffer(1, transientLen, context.sampleRate)
+      const noiseData = noiseBuffer.getChannelData(0)
+      for (let i = 0; i < transientLen; i += 1) {
+        noiseData[i] = (Math.random() * 2 - 1) * (1 - i / transientLen)
+      }
+      const noiseSource = context.createBufferSource()
+      noiseSource.buffer = noiseBuffer
+
+      const bandpass = context.createBiquadFilter()
+      bandpass.type = 'bandpass'
+      bandpass.frequency.value = isMajor ? 2800 : 3800
+      bandpass.Q.value = 2.2
+
+      const noiseGain = context.createGain()
+      noiseGain.gain.value = gain * 0.5
+      noiseSource.connect(bandpass)
+      bandpass.connect(noiseGain)
+      noiseGain.connect(master)
+
+      osc.start(now)
+      noiseSource.start(now)
+      osc.stop(now + toneDuration + 0.01)
+
+      osc.addEventListener(
+        'ended',
+        () => {
+          osc.disconnect()
+          oscGain.disconnect()
+          noiseSource.disconnect()
+          noiseGain.disconnect()
+          bandpass.disconnect()
+          master.disconnect()
+        },
+        { once: true },
+      )
+    } catch {
+      // Non-fatal: never block interaction on audio failures.
+    }
+  }
+
   markNavigationIntent(route: string, playedOnStart = false) {
     if (!this.isSupported()) {
       return
@@ -501,6 +595,14 @@ export const consumeUISoundNavigationIntent = (currentRoute: string) => {
 
 export const playUISound = (cue: UISoundCue) => {
   return uiSoundEngine.play(cue)
+}
+
+export const playDialTick = (options?: {
+  pitchCents?: number
+  gain?: number
+  strength?: 'minor' | 'major'
+}) => {
+  uiSoundEngine.playDialTick(options)
 }
 
 export const getLastUISoundRequestAt = () => {

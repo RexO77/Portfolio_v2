@@ -15,7 +15,7 @@ export interface SocialLink {
 export interface NavItem {
   label: string
   to: string
-  kind?: 'section' | 'route'
+  kind?: 'section' | 'route' | 'external'
 }
 
 export interface ActionLink {
@@ -181,12 +181,38 @@ export interface LifeEssayPortrait {
   caption: string
 }
 
+export interface LifeBook {
+  title: string
+  author: string
+  src: string
+  largeSrc?: string
+}
+
+export interface LifeBooksSection {
+  eyebrow: string
+  caption: string
+  items: LifeBook[]
+}
+
+export interface LifeSpotifyPlaylist {
+  title: string
+  embedUrl: string
+}
+
+export interface LifeSpotifySection {
+  eyebrow: string
+  caption?: string
+  items: LifeSpotifyPlaylist[]
+}
+
 export interface LifeEssayContent {
   eyebrow: string
   titleLines: string[]
   portrait: LifeEssayPortrait
   paragraphs: string[]
   signoff: string
+  books?: LifeBooksSection
+  spotify?: LifeSpotifySection
 }
 
 export interface LifePageContent {
@@ -194,4 +220,36 @@ export interface LifePageContent {
   titleEmphasis: string
   photos: LifePhoto[]
   essay: LifeEssayContent
+}
+
+export type ExperienceAccent =
+  | 'green'
+  | 'yellow'
+  | 'blue'
+  | 'orange'
+  | 'purple'
+  | 'sand'
+
+export interface WorkExperienceMetaItem {
+  label: string
+  value: string
+}
+
+export interface WorkExperience {
+  id: string
+  index: string
+  role: string
+  company: string
+  period: string
+  /** Calendar year the role started. */
+  startYear: number
+  /** Calendar month the role started (1–12). */
+  startMonth: number
+  /** Calendar year the role ended, or `'present'` for a current role. */
+  endYear: number | 'present'
+  /** Calendar month the role ended (1–12). Omit when endYear is `'present'`. */
+  endMonth?: number
+  description: string
+  meta: WorkExperienceMetaItem[]
+  accent: ExperienceAccent
 }
