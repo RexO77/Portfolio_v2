@@ -11,8 +11,12 @@ export const siteMetadata: SiteMetadata = {
 export const navItems = [
   { label: 'life', to: '/life', kind: 'route' },
   { label: 'labs', to: '/#labs', kind: 'section' },
-  { label: 'blog', to: '/#blog', kind: 'section' },
-] satisfies Array<NavItem & { kind: 'section' | 'route' }>
+  {
+    label: 'blog',
+    to: 'https://blog.nischalskanda.tech',
+    kind: 'external',
+  },
+] satisfies Array<NavItem & { kind: 'section' | 'route' | 'external' }>
 
 export const footerNavItems: NavItem[] = [
   { label: 'Work', to: '/#work' },

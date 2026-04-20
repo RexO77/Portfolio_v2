@@ -43,13 +43,6 @@ function getActiveNavTarget(pathname: string, hash: string) {
 
 export function Navbar() {
   const location = useLocation()
-  const routeStateKey = `${location.pathname}${location.hash}`
-
-  return <NavbarContent key={routeStateKey} />
-}
-
-function NavbarContent() {
-  const location = useLocation()
   const navigate = useNavigate()
   const shouldReduceMotion = useReducedMotion()
   const isMobileViewport = useMediaQuery('(max-width: 900px)')
@@ -81,6 +74,15 @@ function NavbarContent() {
 
   const handleSelect = useCallback(
     (item: (typeof navItems)[number]) => {
+      if (item.kind === 'external') {
+        const link = document.createElement('a')
+        link.href = item.to
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
+        link.click()
+        return
+      }
+
       if (item.kind === 'section') {
         const [, targetHash = ''] = item.to.split('#')
         const hash = `#${targetHash}`
@@ -211,10 +213,17 @@ function NavbarContent() {
                         <a
                           href={item.to}
                           className="navbar__mobile-link"
+                          target={item.kind === 'external' ? '_blank' : undefined}
+                          rel={item.kind === 'external' ? 'noopener noreferrer' : undefined}
                           onClick={(event) => {
-                            event.preventDefault()
+                            if (item.kind !== 'external') {
+                              event.preventDefault()
+                            }
                             haptic('nav')
                             setIsMobileOpen(false)
+                            if (item.kind === 'external') {
+                              return
+                            }
                             handleSelect(item)
                           }}
                         >

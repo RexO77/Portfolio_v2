@@ -4,7 +4,12 @@ import { IntroLoader } from '@/features/intro/IntroLoader'
 import { IntroStateProvider } from '@/features/intro/IntroStateProvider'
 import { type IntroState } from '@/features/intro/intro-state'
 
-const INTRO_MIN_DURATION_MS = 3400
+// IntroLoader runs 7 greetings × ~460ms ≈ 3.22s of sequence, plus a small
+// font-preload delay before the first greeting paints. The sequence itself is
+// the natural floor for how long the intro is visible, so this minimum only
+// needs to cover the preload+app-mount window — keeping it below the sequence
+// length avoids any artificial hold.
+const INTRO_MIN_DURATION_MS = 2400
 
 export default function App() {
   const [isIntroActive, setIsIntroActive] = useState(
