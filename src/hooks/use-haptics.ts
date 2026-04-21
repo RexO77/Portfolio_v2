@@ -1,5 +1,9 @@
 import { useCallback } from 'react'
-import { useWebHaptics } from 'web-haptics/react'
+import {
+  haptic as triggerHaptic,
+  supportsHaptics,
+  type HapticPattern,
+} from '@/lib/haptic'
 import { useMediaQuery } from '@/hooks/use-media-query'
 
 export type HapticAction =
@@ -13,29 +17,34 @@ export type HapticAction =
   | 'error'
   | 'off'
 
-const PRESETS: Record<Exclude<HapticAction, 'off'>, string> = {
-  click: 'light',
-  primary: 'medium',
-  nav: 'medium',
-  'menu-open': 'soft',
-  'menu-close': 'rigid',
-  tab: 'selection',
-  success: 'success',
-  error: 'error',
+const PRESETS: Record<Exclude<HapticAction, 'off'>, HapticPattern> = {
+  click: 12,
+  primary: 20,
+  nav: 16,
+  'menu-open': 10,
+  'menu-close': [10, 20, 14],
+  tab: 8,
+  success: [18, 24, 18],
+  error: [32, 28, 24],
 }
 
 export function useHaptics() {
   const hasCoarsePointer = useMediaQuery('(pointer: coarse)')
   const hasAnyCoarsePointer = useMediaQuery('(any-pointer: coarse)')
-  const { trigger, cancel, isSupported } = useWebHaptics({
-    debug: false,
-    showSwitch: false,
-  })
-
   const hasTouchPoints =
     typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
-  const isEnabled =
-    isSupported && (hasCoarsePointer || hasAnyCoarsePointer || hasTouchPoints)
+  const isSupported = supportsHaptics()
+  const isEnabled = isSupported && (hasCoarsePointer || hasAnyCoarsePointer || hasTouchPoints)
+
+  const trigger = useCallback((pattern: HapticPattern = 50) => {
+    return triggerHaptic(pattern)
+  }, [])
+
+  const cancel = useCallback(() => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(0)
+    }
+  }, [])
 
   const haptic = useCallback(
     (action: HapticAction) => {
@@ -43,7 +52,7 @@ export function useHaptics() {
         return
       }
 
-      void trigger?.(PRESETS[action])
+      trigger(PRESETS[action])
     },
     [isEnabled, trigger],
   )
