@@ -253,3 +253,11 @@ export interface WorkExperience {
   meta: WorkExperienceMetaItem[]
   accent: ExperienceAccent
 }
+
+export interface WorkExperienceTimelineYear {
+  year: number
+  /** First month shown on the dial for this year (1–12). */
+  startMonth: number
+  /** Last month shown on the dial for this year, or `'present'` for current. */
+  endMonth: number | 'present'
+}

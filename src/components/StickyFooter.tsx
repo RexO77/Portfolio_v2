@@ -1,41 +1,72 @@
 import { Link } from 'react-router-dom'
-import { footerNavItems, socialLinks, siteMetadata } from '@/content/site'
+import { connectEmail, connectLinks, siteMetadata } from '@/content/site'
+
+const footerLinks = [
+  { label: 'Work', to: '/#work' },
+  { label: 'Life', to: '/life' },
+  { label: 'Blog', href: 'https://blog.nischalskanda.tech' },
+  { label: 'Email', href: `mailto:${connectEmail}` },
+] as const
+
+const externalLinks = connectLinks.filter(
+  (link) => link.kind === 'external' && link.href,
+)
 
 export function StickyFooter() {
-  const firstName = siteMetadata.name.split(' ')[0]
+  const year = new Date().getFullYear()
 
   return (
     <footer className="sticky-footer" aria-label="Site footer">
-      <div className="sticky-footer__inner">
-        <nav className="sticky-footer__links" aria-label="Footer navigation">
-          <ul>
-            {footerNavItems.map((item) => (
-              <li key={item.to}>
-                <Link to={item.to} className="sticky-footer__link">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <ul>
-            {socialLinks.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.url}
-                  className="sticky-footer__link"
-                  target={link.url.startsWith('http') ? '_blank' : undefined}
-                  rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <div className="sticky-footer__body">
+        <div className="sticky-footer__top">
+          <div className="sticky-footer__brand">
+            <p className="sticky-footer__name">{siteMetadata.name}</p>
+            <p className="sticky-footer__tagline">Design engineer and developer.</p>
+          </div>
 
-        <p className="sticky-footer__wordmark" aria-hidden="true">
-          {firstName}
-        </p>
+          <div className="sticky-footer__navs">
+            <nav className="sticky-footer__links" aria-label="Footer navigation">
+              {footerLinks.map((link) =>
+                'to' in link ? (
+                  <Link key={link.label} to={link.to} className="sticky-footer__link">
+                    {link.label.toLowerCase()}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="sticky-footer__link"
+                    target={link.href.startsWith('http') ? '_blank' : undefined}
+                    rel={
+                      link.href.startsWith('http') ? 'noopener noreferrer' : undefined
+                    }
+                  >
+                    {link.label.toLowerCase()}
+                  </a>
+                ),
+              )}
+            </nav>
+
+            <nav
+              className="sticky-footer__links sticky-footer__links--secondary"
+              aria-label="Social links"
+            >
+              {externalLinks.map((link) => (
+                <a
+                  key={link.key}
+                  href={link.href}
+                  className="sticky-footer__link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {link.label.toLowerCase()}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        <p className="sticky-footer__copyright">© {year}, {siteMetadata.name}</p>
       </div>
     </footer>
   )

@@ -11,10 +11,14 @@ import {
 
 import { uiEase } from '@/lib/motion'
 import { playDialTick } from '@/lib/ui-sound'
-import type { WorkExperience } from '@/types/content'
+import type {
+  WorkExperience,
+  WorkExperienceTimelineYear,
+} from '@/types/content'
 
 interface ExperienceDialProps {
   items: WorkExperience[]
+  timelineYears?: WorkExperienceTimelineYear[]
   /**
    * Pixels per calendar year. Larger = more drag travel per year.
    * With 3–4 years of data, 320 gives a comfortable scrub distance.
@@ -22,12 +26,43 @@ interface ExperienceDialProps {
   pxPerYear?: number
 }
 
+interface VisibleMonth {
+  key: string
+  year: number
+  month: number
+  slotIndex: number
+  isYearStart: boolean
+  isQuarterStart: boolean
+}
+
+interface PositionedItem {
+  item: WorkExperience
+  startIndex: number
+  endExclusiveIndex: number
+}
+
 const DEFAULT_PX_PER_YEAR = 200
 
+const MONTH_LABELS = [
+  'JAN',
+  'FEB',
+  'MAR',
+  'APR',
+  'MAY',
+  'JUN',
+  'JUL',
+  'AUG',
+  'SEP',
+  'OCT',
+  'NOV',
+  'DEC',
+] as const
+
 const QUARTER_LABELS = ['JAN', 'APR', 'JUL', 'OCT'] as const
+const MIN_PX_PER_VISIBLE_MONTH = 40
 
 const TITLE_TRANSITION = { duration: 0.45, ease: uiEase }
-const SUB_TRANSITION   = { duration: 0.35, ease: uiEase }
+const SUB_TRANSITION = { duration: 0.35, ease: uiEase }
 const RANGE_SPRING = {
   type: 'spring',
   stiffness: 220,
@@ -44,53 +79,122 @@ const DRAG_TRANSITION = {
 /** Minimum ms between dial tick sounds. */
 const TICK_MIN_INTERVAL_MS = 55
 
-// ── Fractional-year helpers ─────────────────────────────────────────────────
-// All positions are expressed as fractional calendar years, e.g. Aug 2025 =
-// 2025 + (8-1)/12 ≈ 2025.583. This gives month-precise positioning without
-// any floating-point surprises from raw pixel arithmetic.
-
-function startFrac(item: WorkExperience) {
-  return item.startYear + (item.startMonth - 1) / 12
+function monthKey(year: number, month: number) {
+  return `${year}-${String(month).padStart(2, '0')}`
 }
 
-function endFrac(item: WorkExperience, currentYear: number, currentMonth: number) {
-  if (item.endYear === 'present') {
-    return currentYear + (currentMonth - 1) / 12
+function nextMonth(year: number, month: number) {
+  return month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 }
+}
+
+function resolveTimelineEndMonth(
+  yearWindow: WorkExperienceTimelineYear,
+  currentYear: number,
+  currentMonth: number,
+) {
+  if (yearWindow.endMonth === 'present') {
+    return yearWindow.year === currentYear ? currentMonth : 12
   }
-  return item.endYear + ((item.endMonth ?? 12) - 1) / 12
+
+  return yearWindow.endMonth
 }
 
-// ───────────────────────────────────────────────────────────────────────────
+function buildVisibleMonths(
+  items: WorkExperience[],
+  timelineYears: WorkExperienceTimelineYear[] | undefined,
+  currentYear: number,
+  currentMonth: number,
+) {
+  const months: VisibleMonth[] = []
+
+  if (timelineYears?.length) {
+    const sortedYears = [...timelineYears].sort((a, b) => a.year - b.year)
+    let slotIndex = 0
+
+    for (const yearWindow of sortedYears) {
+      const endMonth = resolveTimelineEndMonth(yearWindow, currentYear, currentMonth)
+
+      for (let month = yearWindow.startMonth; month <= endMonth; month += 1) {
+        months.push({
+          key: monthKey(yearWindow.year, month),
+          year: yearWindow.year,
+          month,
+          slotIndex,
+          isYearStart: month === yearWindow.startMonth,
+          isQuarterStart: month === 1 || month === 4 || month === 7 || month === 10,
+        })
+        slotIndex += 1
+      }
+    }
+
+    return months
+  }
+
+  const startYear = Math.min(...items.map((item) => item.startYear))
+  const endYear = Math.max(
+    ...items.map((item) => (item.endYear === 'present' ? currentYear : item.endYear)),
+    currentYear,
+  )
+
+  let slotIndex = 0
+  for (let year = startYear; year <= endYear; year += 1) {
+    for (let month = 1; month <= 12; month += 1) {
+      months.push({
+        key: monthKey(year, month),
+        year,
+        month,
+        slotIndex,
+        isYearStart: month === 1,
+        isQuarterStart: month === 1 || month === 4 || month === 7 || month === 10,
+      })
+      slotIndex += 1
+    }
+  }
+
+  return months
+}
 
 export function ExperienceDial({
   items,
+  timelineYears,
   pxPerYear = DEFAULT_PX_PER_YEAR,
 }: ExperienceDialProps) {
   const reducedMotion = useReducedMotion()
-  const today         = useMemo(() => new Date(), [])
-  const currentYear   = today.getFullYear()
-  const currentMonth  = today.getMonth() + 1 // 1–12
+  const today = useMemo(() => new Date(), [])
+  const currentYear = today.getFullYear()
+  const currentMonth = today.getMonth() + 1 // 1–12
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const [viewportWidth, setViewportWidth] = useState(0)
 
-  // Ruler bounds: snap to whole calendar years for clean labels + ticks.
-  // Add 1 year of breathing room after the latest role so the range pill
-  // never butts up against the ruler edge.
-  const { rulerStartYear, span } = useMemo(() => {
-    const rStart = Math.min(...items.map((i) => i.startYear))
-    // Always leave a full year of breathing room AFTER today (or the latest
-    // endYear, whichever is greater) so the pointer never bumps the right
-    // edge when it's parked on the current role.
-    const latestEnd = Math.max(
-      ...items.map((i) => (i.endYear === 'present' ? currentYear : i.endYear)),
-      currentYear,
-    )
-    const rEnd = latestEnd + 1
-    return { rulerStartYear: rStart, span: rEnd - rStart }
-  }, [items, currentYear])
+  const visibleMonths = useMemo(
+    () => buildVisibleMonths(items, timelineYears, currentYear, currentMonth),
+    [currentMonth, currentYear, items, timelineYears],
+  )
 
-  const rulerWidth = span * pxPerYear
+  const monthIndexByKey = useMemo(
+    () => new Map(visibleMonths.map((month) => [month.key, month.slotIndex])),
+    [visibleMonths],
+  )
+
+  const firstVisibleMonth = visibleMonths[0]
+  const lastVisibleMonth = visibleMonths.at(-1)
+
+  const baselineYearCount = useMemo(() => {
+    if (!firstVisibleMonth || !lastVisibleMonth) {
+      return 1
+    }
+
+    return lastVisibleMonth.year - firstVisibleMonth.year + 1
+  }, [firstVisibleMonth, lastVisibleMonth])
+
+  const rulerWidth = Math.max(
+    baselineYearCount * pxPerYear,
+    visibleMonths.length * MIN_PX_PER_VISIBLE_MONTH,
+  )
+  const pxPerVisibleMonth = visibleMonths.length
+    ? rulerWidth / visibleMonths.length
+    : rulerWidth
 
   useEffect(() => {
     const el = viewportRef.current
@@ -102,57 +206,76 @@ export function ExperienceDial({
     return () => observer.disconnect()
   }, [])
 
-  // Role resolution ──────────────────────────────────────────────────────────
-  // We resolve a role from a 0–1 progress value. Progress maps linearly to
-  // the fractional year range [rulerStartYear, rulerEndYear].
-  //
-  // Overlap logic: when multiple roles cover the same point, the LAST one
-  // in the array wins (most recent role takes precedence — Talview intern
-  // then full-time both show "Talview" correctly).
-  //
-  // Gap logic: when the pointer falls between two roles, we show the most
-  // recent role that has already started (rather than jumping to index 0).
+  const positionedItems = useMemo<PositionedItem[]>(() => {
+    return items.map((item) => {
+      const startIndex =
+        monthIndexByKey.get(monthKey(item.startYear, item.startMonth)) ?? 0
+
+      let endExclusiveIndex = visibleMonths.length
+      if (item.endYear !== 'present') {
+        const { year, month } = nextMonth(item.endYear, item.endMonth ?? 12)
+        endExclusiveIndex =
+          monthIndexByKey.get(monthKey(year, month)) ?? visibleMonths.length
+      }
+
+      return {
+        item,
+        startIndex,
+        endExclusiveIndex: Math.max(startIndex + 1, endExclusiveIndex),
+      }
+    })
+  }, [items, monthIndexByKey, visibleMonths.length])
 
   const resolveIndex = useCallback(
     (p: number) => {
-      const yearFloat = rulerStartYear + p * span
+      const slotCount = Math.max(visibleMonths.length, 1)
+      const slotIndex = Math.max(
+        0,
+        Math.min(slotCount - 1, Math.floor(p * slotCount)),
+      )
 
-      // Exact match (last wins for overlapping roles)
-      for (let i = items.length - 1; i >= 0; i--) {
-        const sf = startFrac(items[i])
-        const ef = endFrac(items[i], currentYear, currentMonth)
-        if (yearFloat >= sf && yearFloat <= ef) return i
+      for (let i = positionedItems.length - 1; i >= 0; i -= 1) {
+        const positionedItem = positionedItems[i]
+        if (
+          slotIndex >= positionedItem.startIndex &&
+          slotIndex < positionedItem.endExclusiveIndex
+        ) {
+          return i
+        }
       }
 
-      // Gap: show the last role whose start is behind the pointer
       let fallback = 0
-      for (let i = 0; i < items.length; i++) {
-        if (startFrac(items[i]) <= yearFloat) fallback = i
+      for (let i = 0; i < positionedItems.length; i += 1) {
+        if (positionedItems[i].startIndex <= slotIndex) fallback = i
       }
       return fallback
     },
-    [items, rulerStartYear, span, currentYear, currentMonth],
+    [positionedItems, visibleMonths.length],
   )
 
-  // Land the pointer a couple of months AFTER today so the initial view is
-  // unambiguously inside the current role's active window — never on a
-  // boundary between two Talview entries.
   const initialProgress = useMemo(() => {
-    const todayFrac = currentYear + (currentMonth - 1) / 12
-    const targetFrac = todayFrac + 2 / 12 // two months past today
-    return Math.min(1, Math.max(0, (targetFrac - rulerStartYear) / span))
-  }, [currentYear, currentMonth, rulerStartYear, span])
+    const todayIndex =
+      monthIndexByKey.get(monthKey(currentYear, currentMonth)) ??
+      Math.max(visibleMonths.length - 1, 0)
+    const targetIndex = Math.min(
+      Math.max(visibleMonths.length - 1, 0),
+      todayIndex + 2,
+    )
 
-  const initialX  = -(rulerWidth * initialProgress)
-  const x         = useMotionValue(initialX)
-  const progress  = useTransform(
+    if (!visibleMonths.length) {
+      return 0
+    }
+
+    return (targetIndex + 0.5) / visibleMonths.length
+  }, [currentMonth, currentYear, monthIndexByKey, visibleMonths.length])
+
+  const initialX = -(rulerWidth * initialProgress)
+  const x = useMotionValue(initialX)
+  const progress = useTransform(
     x,
-    (v) => Math.min(1, Math.max(0, -v / rulerWidth)),
+    (value) => Math.min(1, Math.max(0, -value / rulerWidth)),
   )
 
-  // Ensure `x` is always pinned to the initial position on mount. This
-  // protects against Strict-Mode / HMR cases where a previous session's
-  // motion value could persist and leave the dial off-center.
   const didInitXRef = useRef(false)
   useEffect(() => {
     if (didInitXRef.current) return
@@ -164,19 +287,24 @@ export function ExperienceDial({
     resolveIndex(initialProgress),
   )
 
-  // Tick sound + role change on progress update
-  const months = span * 12
   const lastMonthIndexRef = useRef<number | null>(null)
-  const lastTickAtRef     = useRef(0)
+  const lastTickAtRef = useRef(0)
 
   useMotionValueEvent(progress, 'change', (p) => {
     const next = resolveIndex(p)
     setActiveIndex((prev) => (prev === next ? prev : next))
 
     if (reducedMotion) return
-    const monthIndex = Math.max(0, Math.min(months, Math.floor(p * months)))
-    const prevMonth  = lastMonthIndexRef.current
-    if (prevMonth === null) { lastMonthIndexRef.current = monthIndex; return }
+
+    const monthIndex = Math.max(
+      0,
+      Math.min(visibleMonths.length, Math.floor(p * visibleMonths.length)),
+    )
+    const prevMonth = lastMonthIndexRef.current
+    if (prevMonth === null) {
+      lastMonthIndexRef.current = monthIndex
+      return
+    }
     if (monthIndex === prevMonth) return
     lastMonthIndexRef.current = monthIndex
 
@@ -184,7 +312,9 @@ export function ExperienceDial({
     if (now - lastTickAtRef.current < TICK_MIN_INTERVAL_MS) return
     lastTickAtRef.current = now
 
-    const isMajor = monthIndex % 12 === 0
+    const visibleMonth = visibleMonths[Math.min(monthIndex, visibleMonths.length - 1)]
+    const isMajor = visibleMonth?.isYearStart ?? false
+
     playDialTick({
       strength: isMajor ? 'major' : 'minor',
       pitchCents: (Math.random() * 2 - 1) * 40,
@@ -194,56 +324,138 @@ export function ExperienceDial({
 
   const [isDragging, setIsDragging] = useState(false)
 
-  const active       = items[activeIndex]
-  const activeSF     = startFrac(active)
-  const activeEF     = endFrac(active, currentYear, currentMonth)
-  const rangeLeftPx  = (activeSF - rulerStartYear) * pxPerYear
-  const rangeWidthPx = (activeEF - activeSF) * pxPerYear
-
-  // Tick marks: one per month across the full ruler
-  const ticks = useMemo(
-    () =>
-      Array.from({ length: months + 1 }, (_, i) => ({
-        i,
-        major: i % 12 === 0,
-        mid: i % 12 !== 0 && i % 6 === 0,
-      })),
-    [months],
+  const activePosition = positionedItems[activeIndex]
+  const active = activePosition.item
+  const activeEndYear =
+    active.endYear === 'present' ? currentYear : active.endYear
+  const rangeLeftPx = activePosition.startIndex * pxPerVisibleMonth
+  const rangeWidthPx = Math.max(
+    pxPerVisibleMonth,
+    (activePosition.endExclusiveIndex - activePosition.startIndex) *
+      pxPerVisibleMonth,
   )
 
-  // Axis labels — a year label every January plus quarterly month labels
-  // (Apr, Jul, Oct) between years. This keeps the ruler reading "alive"
-  // as you drag through gaps between roles instead of long dead stretches.
+  const ticks = useMemo(() => {
+    const boundaries = visibleMonths.map((month, index) => ({
+      key: `tick-${month.key}`,
+      leftPct: (index / Math.max(visibleMonths.length, 1)) * 100,
+      major: month.isYearStart,
+      mid: !month.isYearStart && month.isQuarterStart,
+    }))
+
+    boundaries.push({
+      key: 'tick-end',
+      leftPct: 100,
+      major: false,
+      mid: false,
+    })
+
+    return boundaries
+  }, [visibleMonths])
+
   const axisLabels = useMemo(() => {
-    const out: Array<{
+    const grouped = new Map<number, VisibleMonth[]>()
+
+    for (const month of visibleMonths) {
+      const existing = grouped.get(month.year)
+      if (existing) {
+        existing.push(month)
+      } else {
+        grouped.set(month.year, [month])
+      }
+    }
+
+    const labels: Array<{
       key: string
       leftPct: number
       text: string
-      isYear: boolean
-      fracYear: number
+      type: 'year' | 'month'
+      year: number
+      slotIndex?: number
     }> = []
-    for (let m = 0; m <= months; m += 3) {
-      const monthInYear = m % 12
-      const year = rulerStartYear + Math.floor(m / 12)
-      const isYear = monthInYear === 0
-      out.push({
-        key: `${year}-${monthInYear}`,
-        leftPct: (m / months) * 100,
-        text: isYear ? String(year) : QUARTER_LABELS[monthInYear / 3],
-        isYear,
-        fracYear: year + monthInYear / 12,
+
+    for (const [year, months] of grouped.entries()) {
+      const firstMonth = months[0]
+      labels.push({
+        key: `year-${year}`,
+        leftPct:
+          (firstMonth.slotIndex / Math.max(visibleMonths.length, 1)) * 100,
+        text: String(year),
+        type: 'year',
+        year,
       })
+
+      const isPartialYear = months.length < 12
+
+      let labelMonths: VisibleMonth[]
+      if (months.length <= 2) {
+        labelMonths = months
+      } else if (months.length <= 4) {
+        labelMonths = [months[0], months.at(-1)!]
+      } else if (months.length <= 6) {
+        labelMonths = [months[0], months[Math.floor(months.length / 2)], months.at(-1)!]
+      } else {
+        labelMonths = months.filter(
+          (month) => month.month === 4 || month.month === 7 || month.month === 10,
+        )
+      }
+
+      if (isPartialYear && labelMonths.length > 1) {
+        labelMonths = labelMonths.filter((month) => month.month !== 12)
+      }
+
+      if (
+        isPartialYear &&
+        months[0]?.month === 1 &&
+        labelMonths.length > 1 &&
+        labelMonths[0]?.month === 1 &&
+        months[1]
+      ) {
+        labelMonths = [months[1], ...labelMonths.slice(1)]
+      }
+
+      labelMonths = labelMonths.filter(
+        (month, index, arr) => arr.findIndex((candidate) => candidate.key === month.key) === index,
+      )
+
+      for (const month of labelMonths) {
+        labels.push({
+          key: `month-${month.key}`,
+          leftPct:
+            ((month.slotIndex + 0.5) / Math.max(visibleMonths.length, 1)) * 100,
+          text:
+            months.length > 6
+              ? QUARTER_LABELS[Math.floor((month.month - 1) / 3)]
+              : MONTH_LABELS[month.month - 1],
+          type: 'month',
+          year,
+          slotIndex: month.slotIndex,
+        })
+      }
     }
-    return out
-  }, [months, rulerStartYear])
+
+    return labels
+  }, [visibleMonths])
 
   const titleVariants = reducedMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : {
         initial: { y: '32%', opacity: 0, filter: 'blur(14px)' },
-        animate: { y: '0%',  opacity: 1, filter: 'blur(0px)' },
-        exit:    { y: '-32%', opacity: 0, filter: 'blur(14px)' },
+        animate: { y: '0%', opacity: 1, filter: 'blur(0px)' },
+        exit: { y: '-32%', opacity: 0, filter: 'blur(14px)' },
       }
+
+  const timelineStartLabel = firstVisibleMonth
+    ? `${MONTH_LABELS[firstVisibleMonth.month - 1]} ${firstVisibleMonth.year}`
+    : 'start'
+  const timelineEndLabel =
+    lastVisibleMonth &&
+    lastVisibleMonth.year === currentYear &&
+    lastVisibleMonth.month === currentMonth
+      ? 'present'
+      : lastVisibleMonth
+        ? `${MONTH_LABELS[lastVisibleMonth.month - 1]} ${lastVisibleMonth.year}`
+        : 'present'
 
   return (
     <div
@@ -262,14 +474,16 @@ export function ExperienceDial({
 
       <div className="experience-dial__headline">
         <div className="experience-dial__glow-stage" aria-hidden="true">
-          {(['green', 'yellow', 'blue', 'orange', 'purple', 'sand'] as const).map((accent) => (
-            <span
-              key={accent}
-              className="experience-dial__glow"
-              data-accent={accent}
-              data-active={active.accent === accent ? 'true' : 'false'}
-            />
-          ))}
+          {(['green', 'yellow', 'blue', 'orange', 'purple', 'sand'] as const).map(
+            (accent) => (
+              <span
+                key={accent}
+                className="experience-dial__glow"
+                data-accent={accent}
+                data-active={active.accent === accent ? 'true' : 'false'}
+              />
+            ),
+          )}
         </div>
 
         <div className="experience-dial__title-stage">
@@ -309,7 +523,7 @@ export function ExperienceDial({
         className="experience-dial__viewport"
         ref={viewportRef}
         role="group"
-        aria-label={`Drag to scrub career timeline from ${rulerStartYear} to present`}
+        aria-label={`Drag to scrub career timeline from ${timelineStartLabel} to ${timelineEndLabel}`}
       >
         <div className="experience-dial__pointer" aria-hidden="true">
           <svg
@@ -342,33 +556,35 @@ export function ExperienceDial({
           />
 
           <div className="experience-dial__ticks" aria-hidden="true">
-            {ticks.map((t) => (
+            {ticks.map((tick) => (
               <span
-                key={t.i}
+                key={tick.key}
                 className="experience-dial__tick"
-                data-major={t.major ? 'true' : 'false'}
-                data-mid={t.mid ? 'true' : 'false'}
-                style={{ left: `${(t.i / months) * 100}%` }}
+                data-major={tick.major ? 'true' : 'false'}
+                data-mid={tick.mid ? 'true' : 'false'}
+                style={{ left: `${tick.leftPct}%` }}
               />
             ))}
           </div>
 
           <div className="experience-dial__years" aria-hidden="true">
-            {axisLabels.map(({ key, leftPct, text, isYear, fracYear }) => {
-              // Month labels sit inside the active role's span; year labels
-              // light up when the active role touches that calendar year.
-              const inRange = isYear
-                ? fracYear >= Math.floor(activeSF) && fracYear <= Math.ceil(activeEF)
-                : fracYear >= activeSF && fracYear <= activeEF
+            {axisLabels.map((label) => {
+              const inRange =
+                label.type === 'year'
+                  ? label.year >= active.startYear && label.year <= activeEndYear
+                  : label.slotIndex !== undefined &&
+                    label.slotIndex >= activePosition.startIndex &&
+                    label.slotIndex < activePosition.endExclusiveIndex
+
               return (
                 <span
-                  key={key}
+                  key={label.key}
                   className="experience-dial__year"
-                  data-type={isYear ? 'year' : 'month'}
+                  data-type={label.type}
                   data-active={inRange ? 'true' : 'false'}
-                  style={{ left: `${leftPct}%` }}
+                  style={{ left: `${label.leftPct}%` }}
                 >
-                  {text}
+                  {label.text}
                 </span>
               )
             })}

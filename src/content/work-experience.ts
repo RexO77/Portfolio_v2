@@ -1,4 +1,7 @@
-import type { WorkExperience } from '@/types/content'
+import type {
+  WorkExperience,
+  WorkExperienceTimelineYear,
+} from '@/types/content'
 
 // Freelance entries fill the gaps between full-time / internship roles so
 // the dial always has an active accent. Copy is generic on purpose — edit
@@ -154,4 +157,11 @@ export const workExperiences: WorkExperience[] = [
     ],
     accent: 'blue',
   },
+]
+
+export const workExperienceTimelineYears: WorkExperienceTimelineYear[] = [
+  { year: 2023, startMonth: 8, endMonth: 12 },
+  { year: 2024, startMonth: 1, endMonth: 12 },
+  { year: 2025, startMonth: 1, endMonth: 12 },
+  { year: 2026, startMonth: 1, endMonth: 'present' },
 ]

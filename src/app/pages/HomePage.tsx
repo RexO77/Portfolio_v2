@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { ProjectCard } from '@/components/ProjectCard'
+import { StickyFooter } from '@/components/StickyFooter'
 import { ExperienceDial } from '@/components/work/ExperienceDial'
 import { homePageContent } from '@/content/home'
 import { featuredProjects } from '@/content/projects'
-import { workExperiences } from '@/content/work-experience'
+import {
+  workExperiences,
+  workExperienceTimelineYears,
+} from '@/content/work-experience'
 import { useIntroState } from '@/features/intro/useIntroState'
 import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 import '@/styles/experience-dial.css'
@@ -80,8 +84,7 @@ export default function HomePage() {
         </div>
 
         <ExperienceSection />
-
-        <div className="homepage__anchor" id="blog" aria-hidden="true" />
+        <StickyFooter />
       </main>
     </>
   )
@@ -94,7 +97,10 @@ function ExperienceSection() {
       id="experience"
       aria-label="Work experience"
     >
-      <ExperienceDial items={workExperiences} />
+      <ExperienceDial
+        items={workExperiences}
+        timelineYears={workExperienceTimelineYears}
+      />
     </section>
   )
 }

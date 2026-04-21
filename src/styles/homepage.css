@@ -21,8 +21,13 @@
 
 .homepage {
   position: relative;
+  --homepage-nav-overlap: clamp(4.8rem, 8vw, 6.6rem);
   min-height: 100vh;
+  margin-top: calc(var(--homepage-nav-overlap) * -1);
+  padding-top: var(--homepage-nav-overlap);
   overflow: visible;
+  background: var(--color-bg);
+  isolation: isolate;
   z-index: var(--z-raised);
 }
 
@@ -1136,73 +1141,108 @@
   }
 }
 
-/* ── Sticky Footer ────────────────────────────────────── */
+/* ── Footer ───────────────────────────────────────────── */
 
 .sticky-footer {
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  z-index: var(--z-base);
-  width: 100%;
-  height: clamp(280px, 28vw, 360px);
-  background-color: var(--color-text);
-  overflow: hidden;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 360px;
+  position: relative;
+  margin-top: clamp(var(--space-16), 9vw, var(--space-24));
+  padding: 0 var(--content-padding) clamp(var(--space-10), 6vw, var(--space-16));
 }
 
-.sticky-footer__inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.sticky-footer__body {
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-top: clamp(var(--space-8), 4vw, var(--space-12));
+  border-top: 1px solid var(--color-border);
+}
+
+.sticky-footer__top {
   display: flex;
-  justify-content: flex-end;
   align-items: flex-start;
-  padding: var(--space-12) var(--content-padding);
-  text-align: right;
+  justify-content: space-between;
+  gap: clamp(var(--space-8), 4vw, var(--space-12));
+}
+
+.sticky-footer__brand {
+  max-width: 28rem;
+}
+
+.sticky-footer__name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+}
+
+.sticky-footer__tagline {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.sticky-footer__navs {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-4);
 }
 
 .sticky-footer__links {
   display: flex;
-  flex-direction: row;
-  gap: clamp(var(--space-12), 5vw, var(--space-24));
-  font-size: clamp(var(--text-sm), 1.4vw, var(--text-xl));
-}
-
-.sticky-footer__links ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px 18px;
 }
 
 .sticky-footer__link {
+  color: var(--color-text);
   font-family: var(--font-sans);
-  color: var(--color-bg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
   text-decoration: none;
+  opacity: 0.72;
   transition: opacity var(--duration-normal) var(--ease-out);
 }
 
-.sticky-footer__link:hover {
-  opacity: 0.5;
+.sticky-footer__copyright {
+  margin: var(--space-6) 0 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border-subtle);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
 }
 
-.sticky-footer__wordmark {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  padding-left: var(--content-padding);
-  font-family: var(--font-serif);
-  font-size: clamp(80px, 16vw, 200px);
-  font-weight: 400;
-  font-style: italic;
-  line-height: 1;
-  color: var(--color-bg);
-  opacity: 0.12;
-  white-space: nowrap;
-  transform: translateY(28%);
-  pointer-events: none;
-  user-select: none;
+@media (hover: hover) and (pointer: fine) {
+  .sticky-footer__link:hover {
+    opacity: 1;
+  }
+}
+
+.sticky-footer__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (max-width: 720px) {
+  .sticky-footer__top {
+    flex-direction: column;
+  }
+
+  .sticky-footer__navs,
+  .sticky-footer__links {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .sticky-footer__name {
+    font-size: clamp(2.35rem, 12vw, 4rem);
+  }
 }
 
 /* ── Mobile nav stacking ─────────────────────────────── */
@@ -1237,11 +1277,6 @@
     transform: none;
   }
 
-  .navbar__brand,
-  .navbar__nav-wrap {
-    transition: none;
-  }
-
   .floating-badge {
     transform: rotate(10deg);
   }
@@ -1250,6 +1285,9 @@
     animation: none;
   }
 
+  .navbar__brand,
+  .navbar__nav-wrap,
+  .sticky-footer__link,
   .navbar__link::after {
     transition: none;
   }
