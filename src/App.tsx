@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { AppRouter } from '@/app/router'
 import { IntroLoader } from '@/features/intro/IntroLoader'
 import { IntroStateProvider } from '@/features/intro/IntroStateProvider'
@@ -123,6 +124,7 @@ export default function App() {
   return (
     <IntroStateProvider value={introState}>
       <AppRouter />
+      <Analytics />
       {isIntroActive ? (
         <IntroLoader
           canExit={canExitIntro}
