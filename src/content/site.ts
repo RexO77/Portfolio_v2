@@ -18,18 +18,6 @@ export const navItems = [
   },
 ] satisfies Array<NavItem & { kind: 'section' | 'route' | 'external' }>
 
-export const footerNavItems: NavItem[] = [
-  { label: 'Work', to: '/#work' },
-  { label: 'About', to: '/#about' },
-  { label: 'Contact', to: '/#contact' },
-]
-
-export const socialLinks: SocialLink[] = [
-  { label: 'GitHub', url: 'https://github.com/' },
-  { label: 'LinkedIn', url: 'https://linkedin.com/in/' },
-  { label: 'Twitter', url: 'https://twitter.com/' },
-]
-
 export const connectEmail = 'nischal.skanda07@gmail.com'
 
 export interface ConnectLink {
@@ -68,3 +56,17 @@ export const connectLinks: ConnectLink[] = [
     kind: 'external',
   },
 ]
+
+const socialLinkKeys = new Set(['twitter', 'github', 'linkedin'])
+
+export const socialLinks: SocialLink[] = connectLinks
+  .filter(
+    (link): link is ConnectLink & { href: string } =>
+      link.kind === 'external' &&
+      typeof link.href === 'string' &&
+      socialLinkKeys.has(link.key),
+  )
+  .map(({ href, label }) => ({
+    label: label === 'X (Twitter)' ? 'X' : label,
+    url: href,
+  }))
