@@ -1,4 +1,10 @@
-import { useEffect, useState } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
+import { CursorDialog, type CursorDialogPoint, resolveCursorDialogPoint } from '@/components/CursorDialog'
 import { Navbar } from '@/components/Navbar'
 import { ProjectCard } from '@/components/ProjectCard'
 import { StickyFooter } from '@/components/StickyFooter'
@@ -11,6 +17,7 @@ import {
 } from '@/content/work-experience'
 import { useIntroState } from '@/features/intro/useIntroState'
 import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import '@/styles/experience-dial.css'
 
 const CHAR_STAGGER = 0.022
@@ -39,6 +46,8 @@ const totalChars = HERO_CHARACTER_LINES.reduce(
   0,
 )
 const ENTRANCE_DURATION = (BASE_DELAY + totalChars * CHAR_STAGGER) * 1000 + 450
+const HERO_CURSOR_DIALOG_LABEL = 'Hover the letters'
+const INITIAL_CURSOR_DIALOG_POINT: CursorDialogPoint = { x: 0, y: 0 }
 
 export default function HomePage() {
   const { introHandoffStarted, introComplete } = useIntroState()
@@ -68,13 +77,7 @@ export default function HomePage() {
           <div className="glow-layer glow-pink" />
         </div>
 
-        <section className="hero">
-          <div className="hero__text-wrapper">
-            <h1 className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}>
-              <HeroTextCSS animate={heroRevealStarted} />
-            </h1>
-          </div>
-        </section>
+        <HeroSection animate={heroRevealStarted} ready={ready} />
 
         <div className="homepage__anchor" id="labs" aria-hidden="true" />
         <div className="projects-section" id="work">
@@ -87,6 +90,103 @@ export default function HomePage() {
         <StickyFooter />
       </main>
     </>
+  )
+}
+
+function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
+  const canHover = useMediaQuery('(hover: hover) and (pointer: fine)')
+  const [hintDismissed, setHintDismissed] = useState(false)
+  const [hintVisible, setHintVisible] = useState(false)
+  const [hintPoint, setHintPoint] = useState<CursorDialogPoint>(
+    INITIAL_CURSOR_DIALOG_POINT,
+  )
+  const dismissTimeoutRef = useRef<number | null>(null)
+
+  const canShowHint = ready && canHover && !hintDismissed
+
+  useEffect(() => {
+    if (!canShowHint) {
+      setHintVisible(false)
+    }
+  }, [canShowHint])
+
+  useEffect(() => {
+    return () => {
+      if (dismissTimeoutRef.current !== null) {
+        window.clearTimeout(dismissTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const updateHintPosition = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!canShowHint || event.pointerType === 'touch') {
+      return
+    }
+
+    setHintPoint(
+      resolveCursorDialogPoint({
+        clientX: event.clientX,
+        clientY: event.clientY,
+        rect: event.currentTarget.getBoundingClientRect(),
+      }),
+    )
+    setHintVisible(true)
+  }
+
+  const handleCharacterDiscover = (event: ReactPointerEvent<HTMLHeadingElement>) => {
+    if (!canShowHint) {
+      return
+    }
+
+    const target = event.target
+    if (!(target instanceof HTMLElement)) {
+      return
+    }
+
+    if (!target.closest('.hero__char')) {
+      return
+    }
+
+    if (dismissTimeoutRef.current !== null) {
+      return
+    }
+
+    dismissTimeoutRef.current = window.setTimeout(() => {
+      setHintDismissed(true)
+      setHintVisible(false)
+      dismissTimeoutRef.current = null
+    }, 480)
+  }
+
+  return (
+    <section
+      className="hero"
+      onPointerEnter={updateHintPosition}
+      onPointerMove={updateHintPosition}
+      onPointerLeave={() => {
+        if (dismissTimeoutRef.current !== null) {
+          window.clearTimeout(dismissTimeoutRef.current)
+          dismissTimeoutRef.current = null
+        }
+        setHintVisible(false)
+      }}
+    >
+      <CursorDialog
+        label={HERO_CURSOR_DIALOG_LABEL}
+        visible={canShowHint && hintVisible}
+        point={hintPoint}
+        className="cursor-dialog--hero"
+      />
+
+      <div className="hero__text-wrapper">
+        <h1
+          className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}
+          onPointerOverCapture={handleCharacterDiscover}
+        >
+          <HeroTextCSS animate={animate} />
+        </h1>
+      </div>
+    </section>
   )
 }
 

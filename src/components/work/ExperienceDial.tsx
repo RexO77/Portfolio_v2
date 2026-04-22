@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
 import {
   AnimatePresence,
   motion,
@@ -9,6 +16,12 @@ import {
   useTransform,
 } from 'motion/react'
 
+import {
+  CursorDialog,
+  type CursorDialogPoint,
+  resolveCursorDialogPoint,
+} from '@/components/CursorDialog'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import { uiEase } from '@/lib/motion'
 import { playDialTick } from '@/lib/ui-sound'
 import type {
@@ -42,6 +55,8 @@ interface PositionedItem {
 }
 
 const DEFAULT_PX_PER_YEAR = 200
+const DIAL_CURSOR_DIALOG_LABEL = 'Drag the dial'
+const INITIAL_CURSOR_DIALOG_POINT: CursorDialogPoint = { x: 0, y: 0 }
 
 const MONTH_LABELS = [
   'JAN',
@@ -160,6 +175,7 @@ export function ExperienceDial({
   pxPerYear = DEFAULT_PX_PER_YEAR,
 }: ExperienceDialProps) {
   const reducedMotion = useReducedMotion()
+  const canHover = useMediaQuery('(hover: hover) and (pointer: fine)')
   const today = useMemo(() => new Date(), [])
   const currentYear = today.getFullYear()
   const currentMonth = today.getMonth() + 1 // 1–12
@@ -323,6 +339,18 @@ export function ExperienceDial({
   })
 
   const [isDragging, setIsDragging] = useState(false)
+  const [hintDismissed, setHintDismissed] = useState(false)
+  const [hintVisible, setHintVisible] = useState(false)
+  const [hintPoint, setHintPoint] = useState<CursorDialogPoint>(
+    INITIAL_CURSOR_DIALOG_POINT,
+  )
+  const canShowHint = canHover && !hintDismissed
+
+  useEffect(() => {
+    if (!canShowHint || isDragging) {
+      setHintVisible(false)
+    }
+  }, [canShowHint, isDragging])
 
   const activePosition = positionedItems[activeIndex]
   const active = activePosition.item
@@ -457,6 +485,41 @@ export function ExperienceDial({
         ? `${MONTH_LABELS[lastVisibleMonth.month - 1]} ${lastVisibleMonth.year}`
         : 'present'
 
+  const updateHintPosition = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!canShowHint || event.pointerType === 'touch') {
+      return
+    }
+
+    setHintPoint(
+      resolveCursorDialogPoint({
+        clientX: event.clientX,
+        clientY: event.clientY,
+        rect: event.currentTarget.getBoundingClientRect(),
+      }),
+    )
+    setHintVisible(true)
+  }
+
+  const handlePotentialDialInteraction = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (!canShowHint) {
+      return
+    }
+
+    const target = event.target
+    if (!(target instanceof HTMLElement)) {
+      return
+    }
+
+    if (!target.closest('.experience-dial__ruler')) {
+      return
+    }
+
+    setHintDismissed(true)
+    setHintVisible(false)
+  }
+
   return (
     <div
       className="experience-dial"
@@ -465,7 +528,18 @@ export function ExperienceDial({
       data-sound="off"
       data-click-burst="off"
       aria-roledescription="experience dial"
+      onPointerEnter={updateHintPosition}
+      onPointerMove={updateHintPosition}
+      onPointerLeave={() => setHintVisible(false)}
+      onPointerDownCapture={handlePotentialDialInteraction}
     >
+      <CursorDialog
+        label={DIAL_CURSOR_DIALOG_LABEL}
+        visible={canShowHint && hintVisible && !isDragging}
+        point={hintPoint}
+        className="cursor-dialog--dial"
+      />
+
       <div className="experience-dial__eyebrow">
         <span className="experience-dial__rule" aria-hidden="true" />
         <span className="experience-dial__eyebrow-text">Experience</span>
@@ -543,7 +617,11 @@ export function ExperienceDial({
           dragElastic={0.06}
           dragMomentum
           dragTransition={DRAG_TRANSITION}
-          onDragStart={() => setIsDragging(true)}
+          onDragStart={() => {
+            setHintDismissed(true)
+            setHintVisible(false)
+            setIsDragging(true)
+          }}
           onDragEnd={() => setIsDragging(false)}
           style={{ x, width: rulerWidth } satisfies MotionStyle}
         >
