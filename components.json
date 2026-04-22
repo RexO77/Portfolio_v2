@@ -17,5 +17,8 @@
     "utils": "@/lib/utils",
     "hooks": "@/hooks"
   },
+  "registries": {
+    "@fancy": "https://fancycomponents.dev/r/{name}.json"
+  },
   "iconLibrary": "lucide"
 }

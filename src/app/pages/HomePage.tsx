@@ -5,9 +5,9 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react'
 import { CursorDialog, type CursorDialogPoint, resolveCursorDialogPoint } from '@/components/CursorDialog'
+import { Footer } from '@/components/Footer'
 import { Navbar } from '@/components/Navbar'
 import { ProjectCard } from '@/components/ProjectCard'
-import { StickyFooter } from '@/components/StickyFooter'
 import { ExperienceDial } from '@/components/work/ExperienceDial'
 import { homePageContent } from '@/content/home'
 import { featuredProjects } from '@/content/projects'
@@ -87,7 +87,7 @@ export default function HomePage() {
         </div>
 
         <ExperienceSection />
-        <StickyFooter />
+        <Footer />
       </main>
     </>
   )
