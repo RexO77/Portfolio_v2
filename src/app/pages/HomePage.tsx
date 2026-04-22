@@ -47,6 +47,7 @@ const totalChars = HERO_CHARACTER_LINES.reduce(
 )
 const ENTRANCE_DURATION = (BASE_DELAY + totalChars * CHAR_STAGGER) * 1000 + 450
 const HERO_CURSOR_DIALOG_LABEL = 'Hover the letters'
+const DIAL_CURSOR_DIALOG_LABEL = 'Drag the dial'
 const INITIAL_CURSOR_DIALOG_POINT: CursorDialogPoint = { x: 0, y: 0 }
 
 export default function HomePage() {
@@ -191,12 +192,71 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
 }
 
 function ExperienceSection() {
+  const canHover = useMediaQuery('(hover: hover) and (pointer: fine)')
+  const [hintDismissed, setHintDismissed] = useState(false)
+  const [hintVisible, setHintVisible] = useState(false)
+  const [hintPoint, setHintPoint] = useState<CursorDialogPoint>(
+    INITIAL_CURSOR_DIALOG_POINT,
+  )
+
+  const canShowHint = canHover && !hintDismissed
+
+  useEffect(() => {
+    if (!canShowHint) {
+      setHintVisible(false)
+    }
+  }, [canShowHint])
+
+  const updateHintPosition = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!canShowHint || event.pointerType === 'touch') {
+      return
+    }
+
+    setHintPoint(
+      resolveCursorDialogPoint({
+        clientX: event.clientX,
+        clientY: event.clientY,
+        rect: event.currentTarget.getBoundingClientRect(),
+      }),
+    )
+    setHintVisible(true)
+  }
+
+  const handleDialDiscover = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!canShowHint) {
+      return
+    }
+
+    const target = event.target
+    if (!(target instanceof HTMLElement)) {
+      return
+    }
+
+    if (!target.closest('.experience-dial__ruler')) {
+      return
+    }
+
+    setHintDismissed(true)
+    setHintVisible(false)
+  }
+
   return (
     <section
       className="experience-section"
       id="experience"
       aria-label="Work experience"
+      onPointerEnter={updateHintPosition}
+      onPointerMove={updateHintPosition}
+      onPointerLeave={() => setHintVisible(false)}
+      onPointerDownCapture={handleDialDiscover}
     >
+      <CursorDialog
+        label={DIAL_CURSOR_DIALOG_LABEL}
+        visible={canShowHint && hintVisible}
+        point={hintPoint}
+        className="cursor-dialog--dial"
+      />
+
       <ExperienceDial
         items={workExperiences}
         timelineYears={workExperienceTimelineYears}

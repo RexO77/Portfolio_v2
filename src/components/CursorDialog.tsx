@@ -20,8 +20,10 @@ interface ResolveCursorDialogPointOptions {
   clientX: number
   clientY: number
   rect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>
+  offsetX?: number
   offsetY?: number
-  safeX?: number
+  safeLeft?: number
+  safeRight?: number
   safeTop?: number
   safeBottom?: number
 }
@@ -46,20 +48,21 @@ export function resolveCursorDialogPoint({
   clientX,
   clientY,
   rect,
-  offsetY = 24,
-  safeX = 112,
-  safeTop = 10,
-  safeBottom = 68,
+  offsetX = 18,
+  offsetY = 20,
+  safeLeft = 12,
+  safeRight = 180,
+  safeTop = 12,
+  safeBottom = 64,
 }: ResolveCursorDialogPointOptions): CursorDialogPoint {
-  const rawX = clientX - rect.left
+  const rawX = clientX - rect.left + offsetX
   const rawY = clientY - rect.top + offsetY
 
-  const insetX = Math.min(safeX, Math.max(24, rect.width / 2))
-  const maxX = Math.max(insetX, rect.width - insetX)
+  const maxX = Math.max(safeLeft, rect.width - safeRight)
   const maxY = Math.max(safeTop, rect.height - safeBottom)
 
   return {
-    x: clamp(rawX, insetX, maxX),
+    x: clamp(rawX, safeLeft, maxX),
     y: clamp(rawY, safeTop, maxY),
   }
 }
