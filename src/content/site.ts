@@ -10,7 +10,7 @@ export const siteMetadata: SiteMetadata = {
 
 export const navItems = [
   { label: 'life', to: '/life', kind: 'route' },
-  { label: 'labs', to: '/#labs', kind: 'section' },
+  { label: 'labs', to: '/labs', kind: 'route' },
   {
     label: 'blog',
     to: 'https://blog.nischalskanda.tech',

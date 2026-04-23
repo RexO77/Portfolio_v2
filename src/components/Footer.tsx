@@ -10,6 +10,7 @@ import { connectEmail, connectLinks, siteMetadata } from '@/content/site'
 const primaryLinks = [
   { label: 'Work', to: '/#work' },
   { label: 'Life', to: '/life' },
+  { label: 'Labs', to: '/labs' },
   { label: 'Blog', href: 'https://blog.nischalskanda.tech' },
 ] as const
 

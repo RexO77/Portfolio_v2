@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { DiscoverNav } from '@/components/ui/discover-nav'
+import { DiscoverNav, type DiscoverNavItem } from '@/components/ui/discover-nav'
 import { ConnectDropdown } from '@/components/ConnectDropdown'
 import {
   Check,
@@ -32,6 +32,10 @@ const MOBILE_SOCIAL_ICONS: Record<string, ReactNode> = {
 function getActiveNavTarget(pathname: string, hash: string) {
   if (pathname === '/life') {
     return '/life'
+  }
+
+  if (pathname === '/labs') {
+    return '/labs'
   }
 
   if (pathname === '/' && hash) {
@@ -73,7 +77,7 @@ export function Navbar() {
   )
 
   const handleSelect = useCallback(
-    (item: (typeof navItems)[number]) => {
+    (item: DiscoverNavItem) => {
       if (item.kind === 'external') {
         const link = document.createElement('a')
         link.href = item.to

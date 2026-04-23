@@ -4,6 +4,7 @@ import { RootLayout } from '@/app/layouts/RootLayout'
 
 const HomePage = lazy(() => import('@/app/pages/HomePage'))
 const LifePage = lazy(() => import('@/app/pages/LifePage'))
+const LabsPage = lazy(() => import('@/app/pages/LabsPage'))
 const QuestionLibraryCaseStudy = lazy(
   () => import('@/app/pages/QuestionLibraryCaseStudy'),
 )
@@ -28,6 +29,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense>
             <LifePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/labs',
+        element: (
+          <Suspense>
+            <LabsPage />
           </Suspense>
         ),
       },
