@@ -4,7 +4,7 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from 'react'
-import { CursorDialog, type CursorDialogPoint, resolveCursorDialogPoint } from '@/components/CursorDialog'
+import { CursorDialog } from '@/components/CursorDialog'
 import { Footer } from '@/components/Footer'
 import { Navbar } from '@/components/Navbar'
 import { ProjectCard } from '@/components/ProjectCard'
@@ -18,6 +18,10 @@ import {
 import { useIntroState } from '@/features/intro/useIntroState'
 import { useStartupRouteReady } from '@/features/intro/useStartupRouteReady'
 import { useMediaQuery } from '@/hooks/use-media-query'
+import {
+  type CursorDialogPoint,
+  resolveCursorDialogPoint,
+} from '@/lib/cursor-dialog'
 import '@/styles/experience-dial.css'
 
 const CHAR_STAGGER = 0.022
@@ -106,12 +110,6 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
   const canShowHint = ready && canHover && !hintDismissed
 
   useEffect(() => {
-    if (!canShowHint) {
-      setHintVisible(false)
-    }
-  }, [canShowHint])
-
-  useEffect(() => {
     return () => {
       if (dismissTimeoutRef.current !== null) {
         window.clearTimeout(dismissTimeoutRef.current)
@@ -161,7 +159,7 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
 
   return (
     <section
-      className="hero"
+      className="hero-region"
       onPointerEnter={updateHintPosition}
       onPointerMove={updateHintPosition}
       onPointerLeave={() => {
@@ -179,13 +177,15 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
         className="cursor-dialog--hero"
       />
 
-      <div className="hero__text-wrapper">
-        <h1
-          className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}
-          onPointerOverCapture={handleCharacterDiscover}
-        >
-          <HeroTextCSS animate={animate} />
-        </h1>
+      <div className="hero">
+        <div className="hero__text-wrapper">
+          <h1
+            className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}
+            onPointerOverCapture={handleCharacterDiscover}
+          >
+            <HeroTextCSS animate={animate} />
+          </h1>
+        </div>
       </div>
     </section>
   )
@@ -200,12 +200,6 @@ function ExperienceSection() {
   )
 
   const canShowHint = canHover && !hintDismissed
-
-  useEffect(() => {
-    if (!canShowHint) {
-      setHintVisible(false)
-    }
-  }, [canShowHint])
 
   const updateHintPosition = (event: ReactPointerEvent<HTMLElement>) => {
     if (!canShowHint || event.pointerType === 'touch') {
