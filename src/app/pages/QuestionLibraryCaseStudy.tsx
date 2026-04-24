@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar'
@@ -11,7 +11,6 @@ import { siteMetadata, socialLinks } from '@/content/site'
 import {
   CaseStudyFigure,
   CaseStudyList,
-  PasswordGate,
   ReframePanels,
   StatsSection,
 } from '@/features/case-study/components'
@@ -38,36 +37,17 @@ const CASE_STUDY_SECTION_IDS = {
   system: 'case-study-system',
   ownership: 'case-study-ownership',
   impact: 'case-study-impact',
-  gate: 'case-study-full-case-study',
   cta: 'case-study-next-steps',
 } as const
 
-function getUnlockedSectionId(index: number) {
-  return `case-study-unlocked-${index + 1}`
+function getDetailSectionId(index: number) {
+  return `case-study-detail-${index + 1}`
 }
 
 export default function QuestionLibraryCaseStudy() {
-  const [password, setPassword] = useState('')
-  const [isUnlocked, setIsUnlocked] = useState(false)
-  const [isWrong, setIsWrong] = useState(false)
   const { haptic } = useHaptics()
 
   useStartupRouteReady()
-
-  const handleUnlock = () => {
-    if (password.trim().toLowerCase() === caseStudy.gate.password) {
-      setIsUnlocked(true)
-      setIsWrong(false)
-      return 'success' as const
-    }
-
-    if (password.length > 0) {
-      setIsWrong(true)
-      return 'error' as const
-    }
-
-    return 'off' as const
-  }
 
   const tocSections = useMemo<DynamicScrollIslandSection[]>(
     () => [
@@ -83,15 +63,13 @@ export default function QuestionLibraryCaseStudy() {
       { id: CASE_STUDY_SECTION_IDS.system, name: caseStudy.system.label },
       { id: CASE_STUDY_SECTION_IDS.ownership, name: caseStudy.ownership.label },
       { id: CASE_STUDY_SECTION_IDS.impact, name: caseStudy.impact.label },
-      ...(isUnlocked
-        ? caseStudy.unlockedSections.map((section, index) => ({
-            id: getUnlockedSectionId(index),
-            name: section.label,
-          }))
-        : [{ id: CASE_STUDY_SECTION_IDS.gate, name: 'Full Case Study' }]),
+      ...caseStudy.detailSections.map((section, index) => ({
+        id: getDetailSectionId(index),
+        name: section.label,
+      })),
       { id: CASE_STUDY_SECTION_IDS.cta, name: 'Next Steps' },
     ],
-    [isUnlocked],
+    [],
   )
 
   return (
@@ -300,50 +278,30 @@ export default function QuestionLibraryCaseStudy() {
         </motion.div>
       </section>
 
-      {!isUnlocked ? (
+      {caseStudy.detailSections.map((section, sectionIndex) => (
         <section
-          id={CASE_STUDY_SECTION_IDS.gate}
+          key={section.label}
+          id={getDetailSectionId(sectionIndex)}
           className="case-study__section case-study__nav-target"
         >
-          <PasswordGate
-            gate={caseStudy.gate}
-            password={password}
-            isWrong={isWrong}
-            onPasswordChange={(nextPassword) => {
-              setPassword(nextPassword)
-              setIsWrong(false)
-            }}
-            onUnlock={handleUnlock}
-          />
+          <motion.div className="case-study__prose" {...caseStudyRevealProps}>
+            <p className="case-study__label">{section.label}</p>
+            {section.paragraphs.map((paragraph, paragraphIndex) => (
+              <p
+                key={paragraph}
+                className={
+                  sectionIndex === 0 &&
+                  paragraphIndex === section.paragraphs.length - 1
+                    ? 'case-study__prose--emphasis'
+                    : undefined
+                }
+              >
+                {paragraph}
+              </p>
+            ))}
+          </motion.div>
         </section>
-      ) : null}
-
-      {isUnlocked
-        ? caseStudy.unlockedSections.map((section, sectionIndex) => (
-            <section
-              key={section.label}
-              id={getUnlockedSectionId(sectionIndex)}
-              className="case-study__section case-study__nav-target"
-            >
-              <motion.div className="case-study__prose" {...caseStudyRevealProps}>
-                <p className="case-study__label">{section.label}</p>
-                {section.paragraphs.map((paragraph, paragraphIndex) => (
-                  <p
-                    key={paragraph}
-                    className={
-                      sectionIndex === 0 &&
-                      paragraphIndex === section.paragraphs.length - 1
-                        ? 'case-study__prose--emphasis'
-                        : undefined
-                    }
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </motion.div>
-            </section>
-          ))
-        : null}
+      ))}
 
       <section
         id={CASE_STUDY_SECTION_IDS.cta}

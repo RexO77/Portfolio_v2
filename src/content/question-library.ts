@@ -160,16 +160,7 @@ export const questionLibraryCaseStudy: CaseStudyContent = {
       'The system became the backbone for how assessments are authored and scaled inside the Assessment Engine.',
     ],
   },
-  gate: {
-    description:
-      'This project included detailed iterations, rejected directions, and interaction flows designed under tight constraints.',
-    label: 'Enter password to view the full case study.',
-    placeholder: 'Password',
-    buttonLabel: 'Unlock',
-    errorMessage: 'Incorrect password.',
-    password: 'talview',
-  },
-  unlockedSections: [
+  detailSections: [
     {
       label: 'Iterations & Rejected Directions',
       paragraphs: [

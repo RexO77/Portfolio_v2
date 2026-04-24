@@ -172,16 +172,7 @@ export const loginRedesignCaseStudy: CaseStudyContent = {
       'After: a structured, predictable flow with full funnel visibility and a clear separation between UI issues and system latency.',
     ],
   },
-  gate: {
-    description:
-      'This project includes the decision framework, trade-offs, the funnel instrumentation, and the learnings behind the redesign.',
-    label: 'Enter password to view the full case study.',
-    placeholder: 'Password',
-    buttonLabel: 'Unlock',
-    errorMessage: 'Incorrect password.',
-    password: 'talview',
-  },
-  unlockedSections: [
+  detailSections: [
     {
       label: 'Decisions & Trade-offs',
       paragraphs: [

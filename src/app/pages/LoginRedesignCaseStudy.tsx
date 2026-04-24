@@ -40,8 +40,8 @@ const CASE_STUDY_SECTION_IDS = {
   cta: 'case-study-next-steps',
 } as const
 
-function getExtendedSectionId(index: number) {
-  return `case-study-extended-${index + 1}`
+function getDetailSectionId(index: number) {
+  return `case-study-detail-${index + 1}`
 }
 
 export default function LoginRedesignCaseStudy() {
@@ -63,8 +63,8 @@ export default function LoginRedesignCaseStudy() {
       { id: CASE_STUDY_SECTION_IDS.system, name: caseStudy.system.label },
       { id: CASE_STUDY_SECTION_IDS.ownership, name: caseStudy.ownership.label },
       { id: CASE_STUDY_SECTION_IDS.impact, name: caseStudy.impact.label },
-      ...caseStudy.unlockedSections.map((section, index) => ({
-        id: getExtendedSectionId(index),
+      ...caseStudy.detailSections.map((section, index) => ({
+        id: getDetailSectionId(index),
         name: section.label,
       })),
       { id: CASE_STUDY_SECTION_IDS.cta, name: 'Next Steps' },
@@ -278,10 +278,10 @@ export default function LoginRedesignCaseStudy() {
         </motion.div>
       </section>
 
-      {caseStudy.unlockedSections.map((section, sectionIndex) => (
+      {caseStudy.detailSections.map((section, sectionIndex) => (
         <section
           key={section.label}
-          id={getExtendedSectionId(sectionIndex)}
+          id={getDetailSectionId(sectionIndex)}
           className="case-study__section case-study__nav-target"
         >
           <motion.div className="case-study__prose" {...caseStudyRevealProps}>

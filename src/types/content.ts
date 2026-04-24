@@ -146,15 +146,7 @@ export interface CaseStudyContent {
     display: string
     paragraphs: string[]
   }
-  gate: {
-    description: string
-    label: string
-    placeholder: string
-    buttonLabel: string
-    errorMessage: string
-    password: string
-  }
-  unlockedSections: Array<{
+  detailSections: Array<{
     label: string
     paragraphs: string[]
   }>
