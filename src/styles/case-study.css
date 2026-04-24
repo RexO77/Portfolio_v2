@@ -414,96 +414,6 @@
   background-color: var(--color-border);
 }
 
-/* ── Password Gate ───────────────────────────────────── */
-
-.case-study__gate {
-  position: relative;
-  max-width: 28rem;
-  margin-inline: auto;
-  text-align: center;
-}
-
-.case-study__gate-gradient {
-  position: absolute;
-  inset-inline: 0;
-  top: calc(var(--space-10) * -1);
-  height: var(--space-10);
-  background: linear-gradient(to bottom, var(--color-bg), transparent);
-  pointer-events: none;
-}
-
-.case-study__gate-text {
-  font-family: var(--font-sans);
-  font-size: var(--text-lg);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-secondary);
-}
-
-.case-study__gate-label {
-  display: block;
-  margin-top: var(--space-6);
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-}
-
-.case-study__gate-form {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
-
-.case-study__gate-input {
-  flex: 1;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-border-subtle);
-  background-color: var(--color-surface-raised);
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  color: var(--color-text);
-  transition: border-color var(--duration-fast) var(--ease-out);
-}
-
-.case-study__gate-input::placeholder {
-  color: var(--color-text-tertiary);
-}
-
-.case-study__gate-input:focus {
-  outline: none;
-  border-color: var(--color-text-tertiary);
-}
-
-.case-study__gate-input--error {
-  border-color: #c44;
-}
-
-.case-study__gate-input--error:focus {
-  border-color: #d55;
-}
-
-.case-study__gate-btn {
-  padding: var(--space-3) var(--space-6);
-  background-color: var(--color-accent);
-  color: var(--color-bg);
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  border: none;
-  cursor: pointer;
-  transition: background-color var(--duration-fast) var(--ease-out);
-}
-
-.case-study__gate-btn:hover {
-  background-color: var(--color-accent-hover);
-}
-
-.case-study__gate-error {
-  margin-top: var(--space-3);
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  color: #c44;
-}
-
 /* ── CTA Section ─────────────────────────────────────── */
 
 .case-study__cta {
@@ -623,8 +533,6 @@
 /* ── Reduced motion ──────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .case-study__gate-input,
-  .case-study__gate-btn,
   .case-study__cta-primary,
   .case-study__cta-secondary,
   .case-study__back,

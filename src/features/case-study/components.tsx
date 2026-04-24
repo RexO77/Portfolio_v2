@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'motion/react'
 import NumberTicker from '@/components/fancy/NumberTicker'
-import { useHaptics } from '@/hooks/use-haptics'
 import type { CaseStudyContent, CaseStudyImage } from '@/types/content'
 
 const caseStudySmoothEase = [0.4, 0, 0.2, 1] as const
@@ -259,60 +258,5 @@ export function ReframePanels({
       </div>
       <figcaption className="case-study__figcaption">{reframe.panelsCaption}</figcaption>
     </figure>
-  )
-}
-
-interface PasswordGateProps {
-  gate: CaseStudyContent['gate']
-  password: string
-  isWrong: boolean
-  onPasswordChange: (password: string) => void
-  onUnlock: () => 'success' | 'error' | 'off'
-}
-
-export function PasswordGate({
-  gate,
-  password,
-  isWrong,
-  onPasswordChange,
-  onUnlock,
-}: PasswordGateProps) {
-  const { haptic } = useHaptics()
-
-  return (
-    <div className="case-study__gate">
-      <div className="case-study__gate-gradient" />
-      <p className="case-study__gate-text">{gate.description}</p>
-      <label htmlFor="gate-password" className="case-study__gate-label">
-        {gate.label}
-      </label>
-      <div className="case-study__gate-form">
-        <input
-          id="gate-password"
-          type="password"
-          value={password}
-          onChange={(event) => onPasswordChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              onUnlock()
-            }
-          }}
-          placeholder={gate.placeholder}
-          className={`case-study__gate-input${
-            isWrong ? ' case-study__gate-input--error' : ''
-          }`}
-        />
-        <button
-          type="button"
-          onClick={() => {
-            haptic(onUnlock())
-          }}
-          className="case-study__gate-btn"
-        >
-          {gate.buttonLabel}
-        </button>
-      </div>
-      {isWrong ? <p className="case-study__gate-error">{gate.errorMessage}</p> : null}
-    </div>
   )
 }
