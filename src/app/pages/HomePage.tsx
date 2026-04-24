@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
 } from 'react'
@@ -50,7 +49,7 @@ const totalChars = HERO_CHARACTER_LINES.reduce(
   0,
 )
 const ENTRANCE_DURATION = (BASE_DELAY + totalChars * CHAR_STAGGER) * 1000 + 450
-const HERO_CURSOR_DIALOG_LABEL = 'Hover the letters'
+// const HERO_CURSOR_DIALOG_LABEL = 'Hover the letters'
 const DIAL_CURSOR_DIALOG_LABEL = 'Drag the dial'
 const INITIAL_CURSOR_DIALOG_POINT: CursorDialogPoint = { x: 0, y: 0 }
 
@@ -99,6 +98,7 @@ export default function HomePage() {
 }
 
 function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
+  /*
   const canHover = useMediaQuery('(hover: hover) and (pointer: fine)')
   const [hintDismissed, setHintDismissed] = useState(false)
   const [hintVisible, setHintVisible] = useState(false)
@@ -156,10 +156,11 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
       dismissTimeoutRef.current = null
     }, 480)
   }
+  */
 
   return (
-    <section
-      className="hero-region"
+    <section className="hero-region">
+      {/*
       onPointerEnter={updateHintPosition}
       onPointerMove={updateHintPosition}
       onPointerLeave={() => {
@@ -169,7 +170,7 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
         }
         setHintVisible(false)
       }}
-    >
+      */}
       {/*
       <CursorDialog
         label={HERO_CURSOR_DIALOG_LABEL}
@@ -183,8 +184,10 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
         <div className="hero__text-wrapper">
           <h1
             className={`hero__heading${ready ? ' hero__heading--ready' : ''}`}
-            onPointerOverCapture={handleCharacterDiscover}
           >
+            {/*
+            onPointerOverCapture={handleCharacterDiscover}
+            */}
             <HeroTextCSS animate={animate} />
           </h1>
         </div>
