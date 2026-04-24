@@ -170,12 +170,14 @@ function HeroSection({ animate, ready }: { animate: boolean; ready: boolean }) {
         setHintVisible(false)
       }}
     >
+      {/*
       <CursorDialog
         label={HERO_CURSOR_DIALOG_LABEL}
         visible={canShowHint && hintVisible}
         point={hintPoint}
         className="cursor-dialog--hero"
       />
+      */}
 
       <div className="hero">
         <div className="hero__text-wrapper">
