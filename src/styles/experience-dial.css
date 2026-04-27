@@ -122,9 +122,9 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  filter: blur(70px) saturate(1.2);
+  filter: blur(38px) saturate(1.12);
   border-radius: 50%;
-  transition: opacity var(--duration-slower) var(--ease-out);
+  transition: opacity var(--duration-normal) var(--ease-out);
   will-change: opacity;
 }
 
@@ -235,7 +235,7 @@
   background: var(--dial-accent);
   box-shadow: 0 0 12px var(--dial-accent);
   opacity: 0.9;
-  transition: background var(--duration-slower) var(--ease-out);
+  transition: background var(--duration-normal) var(--ease-out);
 }
 
 /* ── Draggable dial viewport ─────────────────────────── */
@@ -279,7 +279,7 @@
   color: var(--dial-accent);
   pointer-events: none;
   filter: drop-shadow(0 2px 6px rgba(30, 30, 30, 0.18));
-  transition: color var(--duration-slower) var(--ease-out);
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .experience-dial__pointer-arrow {
@@ -307,9 +307,6 @@
   cursor: grab;
   user-select: none;
   z-index: 1;
-  /* Ensure the ruler is translate-friendly for the
-     x motion value. The viewport masks the overflow
-     visually via mask-image. */
   will-change: transform;
 }
 
@@ -339,8 +336,8 @@
   letter-spacing: 0.1em;
   color: var(--dial-muted);
   transition:
-    color var(--duration-slow) var(--ease-out),
-    opacity var(--duration-slow) var(--ease-out);
+    color var(--duration-normal) var(--ease-out),
+    opacity var(--duration-normal) var(--ease-out);
 }
 
 .experience-dial__year[data-type='year'] {
@@ -373,8 +370,8 @@
   border-radius: 999px;
   background: var(--dial-accent-soft);
   pointer-events: none;
+  transition: background var(--duration-normal) var(--ease-out);
   will-change: left, width, background;
-  transition: background var(--duration-slower) var(--ease-out);
 }
 
 /* Ticks row. */

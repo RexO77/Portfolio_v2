@@ -67,13 +67,13 @@ const MONTH_LABELS = [
 const QUARTER_LABELS = ['JAN', 'APR', 'JUL', 'OCT'] as const
 const MIN_PX_PER_VISIBLE_MONTH = 40
 
-const TITLE_TRANSITION = { duration: 0.45, ease: uiEase }
-const SUB_TRANSITION = { duration: 0.35, ease: uiEase }
+const TITLE_TRANSITION = { duration: 0.34, ease: uiEase }
+const SUB_TRANSITION = { duration: 0.26, ease: uiEase }
 const RANGE_SPRING = {
   type: 'spring',
-  stiffness: 220,
-  damping: 30,
-  mass: 0.6,
+  stiffness: 360,
+  damping: 34,
+  mass: 0.5,
 } as const
 const DRAG_TRANSITION = {
   power: 0.28,
