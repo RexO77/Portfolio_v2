@@ -328,8 +328,8 @@
 }
 
 .book-cover:focus-visible {
-  outline: 2px solid var(--color-text);
-  outline-offset: 6px;
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-text) 62%, transparent);
   border-radius: 4px;
 }
 
@@ -341,11 +341,10 @@
   filter: blur(14px);
   transform: translate(6px, 10px);
   z-index: -1;
-  transition: transform var(--duration-normal) var(--ease-out),
-    opacity var(--duration-normal) var(--ease-out);
+  transition: transform var(--duration-interaction) var(--ease-out),
+    opacity var(--duration-interaction) var(--ease-out);
 }
 
-.book-cover:hover .book-cover__shadow,
 .book-cover:focus-visible .book-cover__shadow {
   transform: translate(8px, 16px);
   opacity: 0.85;
@@ -430,7 +429,7 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity var(--duration-slow) var(--ease-out);
+  transition: opacity var(--duration-normal) var(--ease-out);
 }
 
 .book-cover__image--loaded {
@@ -478,11 +477,10 @@
   box-shadow: 0 4px 12px rgba(30, 30, 30, 0.08);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--duration-normal) var(--ease-out),
-    transform var(--duration-normal) var(--ease-out);
+  transition: opacity var(--duration-interaction) var(--ease-out),
+    transform var(--duration-interaction) var(--ease-out);
 }
 
-.book-cover:hover .book-cover__label,
 .book-cover:focus-visible .book-cover__label {
   opacity: 1;
   transform: translate(-50%, -2px);
@@ -533,15 +531,31 @@
   color: var(--color-text);
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  transition: transform var(--duration-fast) var(--ease-out),
-    background var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-interaction) var(--ease-out),
+    background var(--duration-interaction) var(--ease-out);
   z-index: 2;
 }
 
-.book-modal__close:hover,
 .book-modal__close:focus-visible {
   transform: scale(1.05);
   background: var(--color-surface);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .book-cover:hover .book-cover__shadow {
+    transform: translate(8px, 16px);
+    opacity: 0.85;
+  }
+
+  .book-cover:hover .book-cover__label {
+    opacity: 1;
+    transform: translate(-50%, -2px);
+  }
+
+  .book-modal__close:hover {
+    transform: scale(1.05);
+    background: var(--color-surface);
+  }
 }
 
 .book-modal__art {

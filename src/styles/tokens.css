@@ -123,9 +123,10 @@
 
   /* ── Motion ─────────────────────────────────────────── */
   --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
-  --duration-slower: 600ms;
+  --duration-interaction: 180ms;
+  --duration-normal: 200ms;
+  --duration-slow: 320ms;
+  --duration-slower: 480ms;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);

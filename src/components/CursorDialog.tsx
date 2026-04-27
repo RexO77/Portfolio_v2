@@ -38,7 +38,7 @@ export function CursorDialog({
   const reducedMotion = useReducedMotion()
   const dialogTransition = reducedMotion
     ? { duration: 0.12, ease: 'linear' as const }
-    : { duration: 0.24, ease: [0.22, 1, 0.36, 1] as const }
+    : { duration: 0.18, ease: [0.22, 1, 0.36, 1] as const }
   const left = useMotionValue(point.x)
   const top = useMotionValue(point.y)
   const smoothLeft = useSpring(

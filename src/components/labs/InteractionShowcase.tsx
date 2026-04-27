@@ -190,7 +190,7 @@ export function InteractionShowcase({
               animate={{
                 scale: isCopied && !shouldReduceMotion ? [1, 0.94, 1] : 1,
               }}
-              transition={{ duration: 0.24, ease: uiEase }}
+              transition={{ duration: 0.18, ease: uiEase }}
               whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
             >

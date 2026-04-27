@@ -18,11 +18,7 @@
   font-size: var(--text-sm);
   color: var(--color-text-tertiary);
   text-decoration: none;
-  transition: color var(--duration-fast) var(--ease-out);
-}
-
-.case-study__back:hover {
-  color: var(--color-text-secondary);
+  transition: color var(--duration-interaction) var(--ease-out);
 }
 
 .case-study__back svg {
@@ -453,11 +449,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-decoration: none;
-  transition: background-color var(--duration-fast) var(--ease-out);
-}
-
-.case-study__cta-primary:hover {
-  background-color: var(--color-accent-hover);
+  transition: background-color var(--duration-interaction) var(--ease-out);
 }
 
 .case-study__cta-secondary {
@@ -469,11 +461,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-decoration: none;
-  transition: border-color var(--duration-fast) var(--ease-out);
-}
-
-.case-study__cta-secondary:hover {
-  border-color: var(--color-text);
+  transition: border-color var(--duration-interaction) var(--ease-out);
 }
 
 /* ── Footer ──────────────────────────────────────────── */
@@ -510,11 +498,25 @@
   color: var(--color-bg);
   text-decoration: none;
   opacity: 0.7;
-  transition: opacity var(--duration-fast) var(--ease-out);
+  transition: opacity var(--duration-interaction) var(--ease-out);
 }
 
-.case-study__footer-links a:hover {
-  opacity: 1;
+@media (hover: hover) and (pointer: fine) {
+  .case-study__back:hover {
+    color: var(--color-text-secondary);
+  }
+
+  .case-study__cta-primary:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .case-study__cta-secondary:hover {
+    border-color: var(--color-text);
+  }
+
+  .case-study__footer-links a:hover {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 767px) {
