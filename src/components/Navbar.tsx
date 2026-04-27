@@ -140,7 +140,7 @@ export function Navbar() {
 
   const mobilePanelTransition = shouldReduceMotion
     ? { duration: 0 }
-    : { duration: 0.28, ease: [0.16, 1, 0.3, 1] as const }
+    : { duration: 0.18, ease: [0.16, 1, 0.3, 1] as const }
 
   return (
     <>
@@ -238,7 +238,7 @@ export function Navbar() {
                   </ul>
 
                   <div className="navbar__mobile-connect">
-                    <p className="navbar__mobile-connect-label">Connect with me</p>
+                    <p className="navbar__mobile-connect-label">Connect</p>
 
                     <button
                       type="button"
