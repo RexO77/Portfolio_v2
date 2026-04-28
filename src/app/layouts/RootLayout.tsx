@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { useLocation, useOutlet } from 'react-router-dom'
 import ClickBurstOverlay from '@/components/ClickBurstOverlay'
+import { CursorDot } from '@/components/CursorDot'
 import UISoundProvider from '@/components/UISoundProvider'
 import { useIntroState } from '@/features/intro/useIntroState'
 
@@ -72,6 +73,8 @@ export function RootLayout() {
     >
       <UISoundProvider />
       <ClickBurstOverlay />
+      {/* The desktop cursor is a DOM layer so it can invert against any surface. */}
+      <CursorDot />
       <div className="route-shell">{outlet}</div>
     </div>
   )

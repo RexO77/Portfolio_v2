@@ -6,6 +6,7 @@ import '@/styles/animations.css'
 import '@/styles/homepage.css'
 import '@/styles/intro-loader.css'
 import '@/styles/click-burst.css'
+import '@/styles/cursors.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
