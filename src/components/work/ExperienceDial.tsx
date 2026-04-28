@@ -67,8 +67,8 @@ const MONTH_LABELS = [
 const QUARTER_LABELS = ['JAN', 'APR', 'JUL', 'OCT'] as const
 const MIN_PX_PER_VISIBLE_MONTH = 40
 
-const TITLE_TRANSITION = { duration: 0.34, ease: uiEase }
-const SUB_TRANSITION = { duration: 0.26, ease: uiEase }
+const TITLE_TRANSITION = { duration: 0.36, ease: uiEase }
+const SUB_TRANSITION = { duration: 0.3, ease: uiEase }
 const RANGE_SPRING = {
   type: 'spring',
   stiffness: 360,
@@ -446,9 +446,9 @@ export function ExperienceDial({
   const titleVariants = reducedMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
     : {
-        initial: { y: '32%', opacity: 0, filter: 'blur(14px)' },
+        initial: { y: '20%', opacity: 0, filter: 'blur(8px)' },
         animate: { y: '0%', opacity: 1, filter: 'blur(0px)' },
-        exit: { y: '-32%', opacity: 0, filter: 'blur(14px)' },
+        exit: { y: '-20%', opacity: 0, filter: 'blur(8px)' },
       }
 
   const timelineStartLabel = firstVisibleMonth

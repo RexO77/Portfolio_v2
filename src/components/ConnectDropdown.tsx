@@ -116,12 +116,12 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
 
   const menuTransition = shouldReduceMotion
     ? { duration: 0 }
-    : { type: 'spring' as const, stiffness: 420, damping: 28, mass: 0.7 }
+    : { type: 'spring' as const, stiffness: 320, damping: 34, mass: 0.78 }
 
   const itemTransition = (index: number) =>
     shouldReduceMotion
       ? { duration: 0 }
-      : { duration: 0.18, delay: index * 0.035, ease: [0.16, 1, 0.3, 1] as const }
+      : { duration: 0.22, delay: index * 0.04, ease: [0.16, 1, 0.3, 1] as const }
 
   return (
     <div

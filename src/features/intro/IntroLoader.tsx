@@ -13,14 +13,14 @@ interface IntroLoaderProps {
 // which keeps the composition clean and readable.
 //
 // stepMs is the cadence between greeting starts and equals
-// enter (180ms) + hold (130ms) + exit (150ms) = 460ms.
-// Seven greetings × 460ms ≈ 3.22s of sequence + 280ms wrapper fade.
+// enter (240ms) + hold (170ms) + exit (190ms) = 600ms.
+// Seven greetings × 600ms ≈ 4.2s of sequence + 340ms wrapper fade.
 // The sequence does not start until the greeting fonts are actually loaded
 // (see `glyphsReady`), so each greeting paints in its real script on its
 // first frame — no FOUT / fallback flash.
-const STANDARD_STEP_MS = 460
+const STANDARD_STEP_MS = 600
 const REDUCED_MOTION_STEP_MS = 340
-const STANDARD_EXIT_MS = 280
+const STANDARD_EXIT_MS = 340
 const REDUCED_MOTION_EXIT_MS = 200
 
 // Cap how long we'll wait for the Indic webfonts before falling back to
@@ -29,9 +29,10 @@ const REDUCED_MOTION_EXIT_MS = 200
 const FONT_PRELOAD_MAX_MS = 1200
 
 // Buttery, "settled" easing. Slight asymmetry: enter eases out softly so it
-// arrives without snap; exit eases in so it leaves with intent.
+// arrives without snap; exit keeps enough ease-in to leave with intent without
+// feeling pulled away.
 const EASE_ENTER: [number, number, number, number] = [0.16, 1, 0.3, 1]
-const EASE_EXIT: [number, number, number, number] = [0.7, 0, 0.84, 0]
+const EASE_EXIT: [number, number, number, number] = [0.55, 0, 0.35, 1]
 const EASE_INOUT: [number, number, number, number] = [0.65, 0, 0.35, 1]
 
 // Maps each script to the actual font family the greeting paints in. Mirrors
@@ -153,9 +154,9 @@ export function IntroLoader({ canExit, onExitStart, onComplete }: IntroLoaderPro
   // Short, smooth single-element transitions. With mode="wait", these run
   // back-to-back (exit → enter) so the perceived gap between greetings is
   // exitDuration. Numbers chosen to sum to stepMs:
-  //   enter (180ms) + hold (~130ms idle) + exit (150ms) = 460ms.
-  const enterDuration = prefersReducedMotion ? 0.14 : 0.18
-  const exitDuration = prefersReducedMotion ? 0.12 : 0.15
+  //   enter (240ms) + hold (~170ms idle) + exit (190ms) = 600ms.
+  const enterDuration = prefersReducedMotion ? 0.14 : 0.24
+  const exitDuration = prefersReducedMotion ? 0.12 : 0.19
   const yOffset = prefersReducedMotion ? 0 : 6
   const blurAmount = prefersReducedMotion ? 0 : 3
 
