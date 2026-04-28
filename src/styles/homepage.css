@@ -1218,7 +1218,7 @@
 .footer {
   position: relative;
   margin-top: clamp(var(--space-16), 9vw, var(--space-24));
-  padding: 0 var(--content-padding) clamp(var(--space-10), 6vw, var(--space-16));
+  padding: 0 var(--content-padding) 0;
 }
 
 .footer__line,
@@ -1275,18 +1275,24 @@
   padding-top: 8px;
 }
 
-.footer__ground {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: color-mix(in srgb, var(--color-text) 30%, transparent);
-  z-index: 2;
-}
-
 .footer__gravity-scene {
   z-index: 1;
+  -webkit-mask-image:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      #000 1.25rem,
+      #000 calc(100% - 1.25rem),
+      transparent 100%
+    );
+  mask-image:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      #000 1.25rem,
+      #000 calc(100% - 1.25rem),
+      transparent 100%
+    );
 }
 
 .footer__gravity-static,

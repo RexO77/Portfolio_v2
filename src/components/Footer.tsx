@@ -156,9 +156,6 @@ export function Footer() {
             ))}
           </Gravity>
         )}
-
-        {/* Visual ground line */}
-        <div className="footer__ground" aria-hidden="true" />
       </div>
     </footer>
   )
