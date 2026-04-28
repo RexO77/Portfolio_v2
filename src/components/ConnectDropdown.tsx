@@ -143,6 +143,9 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
           'navbar__connect-trigger',
           isOpen && 'navbar__connect-trigger--open',
         )}
+        onMouseDown={(event) => {
+          event.preventDefault()
+        }}
         onClick={() => {
           if (isOpen) {
             haptic('menu-close')

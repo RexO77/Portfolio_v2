@@ -345,6 +345,18 @@
     transform var(--duration-fast) var(--ease-out);
 }
 
+.navbar__connect-trigger:focus {
+  outline: none;
+}
+
+.navbar__connect-trigger:focus:not(:focus-visible) {
+  box-shadow: none;
+}
+
+.navbar__connect-trigger:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-text) 18%, transparent);
+}
+
 .navbar__connect-trigger:hover {
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.55);
