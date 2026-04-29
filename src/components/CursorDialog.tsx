@@ -56,7 +56,7 @@ export function CursorDialog({
   }, [left, point.x, point.y, top])
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {visible ? (
         <motion.div
           aria-hidden="true"

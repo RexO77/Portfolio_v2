@@ -172,7 +172,7 @@ export function ConnectDropdown({ className }: ConnectDropdownProps) {
         </motion.span>
       </button>
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
             id={menuId}

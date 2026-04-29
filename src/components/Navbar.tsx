@@ -200,7 +200,7 @@ export function Navbar() {
               )}
             </button>
 
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {isMobileViewport && isMobileOpen && (
                 <motion.section
                   id="mobile-navigation"
