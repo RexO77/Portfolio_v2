@@ -87,7 +87,7 @@ const NumberTicker = forwardRef<NumberTickerRef, NumberTickerProps>(
     }, [autoStart, startAnimation])
 
     return (
-      <motion.span className={className} {...props}>
+      <motion.span className={`tabular-nums${className ? ` ${className}` : ''}`} {...props}>
         {formatted}
       </motion.span>
     )
