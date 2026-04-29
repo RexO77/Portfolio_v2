@@ -51,7 +51,7 @@ export function DiscoverNav({
               'discover-nav__item--intro relative z-10 inline-flex min-h-[2.45rem] flex-1 items-center justify-center rounded-full px-3 py-2 text-[0.82rem] leading-none whitespace-nowrap transition-[color,transform,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] sm:flex-none md:min-h-[2.65rem] md:px-3.5 md:text-[0.92rem]',
               isActive
                 ? 'text-[var(--color-bg)]'
-                : 'text-[rgba(30,30,30,0.72)] active:scale-[0.98]',
+                : 'text-[rgba(30,30,30,0.72)] active:scale-[0.96]',
             )}
           >
             {isActive ? (

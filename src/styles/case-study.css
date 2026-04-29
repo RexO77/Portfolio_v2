@@ -452,7 +452,12 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-decoration: none;
-  transition: background-color var(--duration-interaction) var(--ease-out);
+  transition: background-color var(--duration-interaction) var(--ease-out),
+    transform var(--duration-interaction) var(--ease-out);
+}
+
+.case-study__cta-primary:active {
+  transform: scale(0.96);
 }
 
 .case-study__cta-secondary {
@@ -464,7 +469,12 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-decoration: none;
-  transition: border-color var(--duration-interaction) var(--ease-out);
+  transition: border-color var(--duration-interaction) var(--ease-out),
+    transform var(--duration-interaction) var(--ease-out);
+}
+
+.case-study__cta-secondary:active {
+  transform: scale(0.96);
 }
 
 /* ── Footer ──────────────────────────────────────────── */

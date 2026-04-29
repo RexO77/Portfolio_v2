@@ -321,6 +321,11 @@
   text-align: left;
   outline: none;
   isolation: isolate;
+  transition: transform var(--duration-interaction) var(--ease-out);
+}
+
+.book-cover:active {
+  transform: scale(0.96);
 }
 
 @media (min-width: 768px) {
