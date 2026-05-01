@@ -155,7 +155,10 @@ export default function LoginRedesignCaseStudy() {
             <CaseStudyList items={caseStudy.problem.bullets} />
           </div>
 
-          <CaseStudyFigure image={caseStudy.problem.image} />
+          <CaseStudyFigure
+            image={caseStudy.problem.image}
+            className="case-study__figure"
+          />
         </motion.div>
       </section>
 
