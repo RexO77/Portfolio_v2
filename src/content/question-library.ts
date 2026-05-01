@@ -10,9 +10,9 @@ export const questionLibraryCaseStudy: CaseStudyContent = {
   summary,
   hero: {
     backLabel: 'Back to projects',
-    title: 'Building a Question Library That Thinks in Skills',
+    title: 'Question Library: From Table Chaos to a Skills-First Assessment System',
     subtitle:
-      'A new explorer based system that makes skill structure visible, reduces duplication, and prepares the Assessment Engine for AI-driven workflows.',
+      'Helping SMEs find, trust, reuse, and create assessment questions by moving the Question Library from a flat table to a skills-first explorer.',
     meta: [
       { label: 'Role', value: 'Product Designer' },
       { label: 'Timeline', value: '8 weeks' },
@@ -22,167 +22,217 @@ export const questionLibraryCaseStudy: CaseStudyContent = {
     image: {
       src: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1800&h=1200&fit=crop',
       alt: 'Skill Taxonomy explorer interface',
-      caption: 'Final explorer-based Skill Taxonomy experience',
+      caption:
+        'Skills become visible. Questions become easier to trust, compare, and reuse.',
     },
   },
   context: {
-    label: 'Context',
+    label: 'What this project was',
     paragraphs: [
-      'Question Library is the operating system for assessments, grading, and report generation.',
-      'Talview is a B2B SaaS company in HR tech building an Agentic AI experience across proctoring, interviewing, and candidate evaluation. The Question Library sits inside the Assessment Engine and powers how assessments are created, evaluated, and scaled.',
-      'Before AI could reason about skills, humans needed a way to define them clearly and consistently.',
+      'Talview’s Assessment Engine powers assessment creation, grading, and reporting. The Question Library is where skills, questions, metadata, and assessment content come together.',
+      'As Talview moved toward Agentic AI, the library needed to do more than store questions. It had to make skill-question relationships clear enough for both humans and AI to trust.',
+      'Before AI could understand skills, humans had to define them clearly.',
     ],
   },
   problem: {
-    label: 'The Problem',
-    heading: 'Where reuse failed',
+    label: 'Current state',
+    heading: 'A table that stored content, but did not create trust',
     paragraphs: [
-      'SMEs build assessments by deciding which skills matter, then finding or creating questions that reliably test those skills.',
-      'The old system stored questions in a large table with tags and filters. Searching for a skill often returned many similar questions with different names, tags, or formats.',
-      'So reuse collapsed. People recreated questions instead of reusing them.',
+      'Questions lived in a large table with tags and filters. This worked for storage, but not for decision-making.',
+      'When SMEs searched for a skill, they often found similar questions with different names, tags, or formats. There was no clear way to know which question was canonical, which skill it truly measured, or whether it was already being used elsewhere.',
+      'So people recreated questions instead of reusing uncertain ones.',
     ],
     bullets: [
-      'Similar questions, different tags',
-      'No canonical source of truth',
-      'Recreating felt safer than reusing',
+      'A machine learning question could appear under machine learning, data science, and algorithms.',
+      'Similar questions appeared under different names and tags.',
+      'The table stored content, but it did not create trust.',
     ],
     image: {
       src: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200&h=800&fit=crop',
-      alt: 'Search returned many near-duplicates without context',
+      alt: 'Old search results showing duplicate questions',
       caption:
-        'Search returned many near-duplicates without context or ownership',
+        'Similar questions appeared under different names and tags. The table stored content, but it did not create trust.',
     },
   },
   whyItMattered: {
     label: 'Why This Mattered',
-    intro: 'This was not just a usability issue. It created noise for humans and for AI.',
+    intro:
+      'This was not only a usability issue. It created operational waste and weaker data for AI.',
     stats: [
       {
         prefix: '₹',
-        from: 30,
+        from: 0,
         target: 60,
         suffix: 'L',
-        description: 'wasted on duplicate content and cleanup effort',
+        description: 'lower-bound duplicated procurement and cleanup cost',
+      },
+      {
+        from: 0,
+        target: 4,
+        suffix: 'x/wk',
+        description: 'CTO and PM reviews during the most intense phase',
       },
       {
         from: 4,
         target: 8,
         suffix: ' wks',
-        description: 'from concept to shipped solution',
-      },
-      {
-        from: 50,
-        target: 100,
-        suffix: '+',
-        description: 'hours lost to normalization and rework',
+        description: 'to move from structural exploration to shipped direction',
       },
     ],
-    note: 'Imports arrived in Word, PDF, Excel, and Markdown, each requiring manual standardization.',
+    note:
+      'Question content came from multiple third-party providers in Word, PDF, Excel, and Markdown. During cleanup, duplicate and near-duplicate questions became visible across providers and tags.',
   },
   obviousFix: {
-    label: 'What the Obvious Fix Missed',
+    label: 'What did not work',
     paragraphs: [
-      'My first instinct was to fix the table. Cleaner layout, better filters, less clutter.',
-      'It failed because tables flatten relationships. Skills are not rows. Improving the surface did not change how users reasoned or reused content.',
+      'My first instinct was to improve the table: cleaner layout, better filters, stronger column hierarchy, less noise.',
+      'It looked better, but it kept the same problem. Users still had to compare metadata instead of understanding relationships.',
     ],
     image: {
       src: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop',
       alt: 'V1 improved table layout',
-      caption: 'V1 improved the table, but the mental model stayed flat',
+      caption: 'V1 improved the surface, but the mental model stayed flat.',
     },
   },
   reframe: {
-    label: 'The Reframe',
-    display: 'The real problem was the mental model.',
+    label: 'What changed',
+    display: 'Skills behave like folders. Questions behave like files.',
     paragraphs: [
-      'People already understand how to organize complex systems. They do it daily in tools like Finder and Figma.',
-      'Hierarchy is a human pattern we already trust.',
+      'This gave SMEs a familiar way to browse, understand, and reuse content. Instead of searching through rows and tags, they could move through a hierarchy and see questions in context.',
+      'Tables are useful for storage. Skills need hierarchy, context, and dependencies.',
     ],
     bullets: [
-      'Skills behave like folders',
-      'Questions behave like files',
-      'Hierarchy becomes visible',
-      'Context stays intact',
-      'Reuse becomes natural',
+      'Hierarchy over filters',
+      'Preview over navigation',
+      'Reuse as trust',
+      'Familiarity over novelty',
     ],
     rows: [
-      { q: 'Q: Define polymorphism', tag: 'OOP' },
-      { q: 'Q: Explain inheritance', tag: 'OOP' },
-      { q: 'Q: What is polymorphism?', tag: 'Java' },
-      { q: 'Q: Describe OOP concepts', tag: 'General', dim: true },
+      { q: 'Q: Train/test split basics', tag: 'ML' },
+      { q: 'Q: Model overfitting', tag: 'Data Science' },
+      { q: 'Q: Classification metrics', tag: 'Algorithms' },
+      { q: 'Q: Supervised learning', tag: 'General', dim: true },
     ],
     panelsCaption: 'From rows and tags to hierarchy and context',
     tree: {
-      root: 'Programming',
+      root: 'Assessment Skills',
       branches: [
         {
-          name: 'OOP',
-          leaves: ['Polymorphism', 'Inheritance'],
+          name: 'Machine Learning',
+          leaves: ['Classification', 'Model Evaluation'],
         },
         {
-          name: 'Functional',
+          name: 'Data Science',
           collapsed: true,
         },
       ],
     },
   },
   system: {
-    label: 'The System',
+    label: 'What we built',
     paragraphs: [
-      'The final design introduced a hierarchical skill explorer paired with an instant preview pane. Selecting a skill surfaces its description, related domains, and associated questions in context. Questions stay embedded within the hierarchy to preserve meaning and ownership.',
-      'Selecting a skill shows details and linked questions instantly, without modals.',
+      'The final design introduced a Skill Taxonomy explorer with an instant preview pane. The left side shows domains, skills, and subskills. The preview area explains what a selected skill means and which questions belong to it.',
+      'Selecting a skill surfaces related questions instantly, without modals or page jumps.',
     ],
     image: {
       src: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&h=800&fit=crop',
       alt: 'Skill Taxonomy explorer: skill tree on left, preview pane in center, question metadata inline',
-      caption: 'Structure does the work, the interface stays quiet',
+      caption:
+        'Skill hierarchy, preview context, and linked questions stay visible in one workspace.',
     },
   },
   ownership: {
-    label: 'My Role & Ownership',
+    label: 'My role',
     paragraphs: [
-      'After the first iteration, leadership explicitly pushed for a fundamentally different approach. From that point, I owned problem reframing, the new mental model, the explorer structure, and iterative exploration.',
-      'The Associate PM helped validate direction and filter feedback. Reviews with the CTO and PM were frequent, three to four sessions per week during the intense phase.',
-      'Timelines, technical feasibility, and procurement scope were outside design ownership.',
+      'I joined as a product design intern and later owned the core UX direction for the Skill Taxonomy experience.',
+      'I owned problem reframing, UX architecture, the explorer interaction model, design iterations, and stakeholder alignment.',
+      'The PM helped validate direction and filter feedback. During the most intense phase, reviews with the CTO and PM happened three to four times per week.',
     ],
     successLabel: 'What success looked like',
     successBullets: [
-      'Fast reuse decisions',
-      'Clear skill structure',
-      'Reduced duplication',
+      'SMEs could understand what skill a question measured.',
+      'Questions could be evaluated without losing context.',
+      'Reuse felt safer than recreating uncertain content.',
     ],
   },
   impact: {
-    label: 'Impact',
+    label: 'What happened',
     display:
-      'The new system reduced duplication, improved discoverability, and created a foundation where both humans and AI can reason about skills consistently.',
+      'The Question Library moved from passive storage toward an active assessment workspace.',
     paragraphs: [
-      'The system became the backbone for how assessments are authored and scaled inside the Assessment Engine.',
+      'This was a foundational product direction shift during a larger Assessment Engine refactor.',
+      'The redesigned Question Library made skill hierarchy visible, made existing content easier to trust, and gave the product a stronger base for AI-driven workflows.',
     ],
+    image: {
+      src: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&h=800&fit=crop',
+      alt: 'Final Skill Taxonomy explorer motion demo',
+      caption:
+        'Explore a skill, review linked questions, and act without losing context.',
+    },
   },
   detailSections: [
     {
-      label: 'Iterations & Rejected Directions',
+      label: 'What was broken',
       paragraphs: [
-        'The first three iterations centered on improving the existing table: better column ordering, inline skill tags, and contextual filters. Each version tested well in isolation but failed when SMEs had to cross-reference skills across assessments.',
-        'A card-based layout was explored next, grouping questions by skill cluster. This surfaced relationships better, but introduced cognitive load when skills spanned multiple domains.',
-        'The breakthrough came from observing that users naturally described skills in terms of hierarchy: parent skills, sub-skills, and leaf-level questions. The interface needed to match this mental model, not abstract over it.',
+        'The old interface started with inventory: rows, tags, filters, and metadata.',
+        'But SMEs started with intent: “I need to evaluate this role.”',
+        'They needed to know what skill a question measured, whether it was the best version to reuse, and how it related to the assessment they were building.',
+        'The old system optimized for storage. Users needed sense-making.',
       ],
     },
     {
-      label: 'Interaction Details',
+      label: 'Before vs after',
       paragraphs: [
-        'The explorer uses a persistent sidebar with expandable skill nodes. Clicking a skill opens a context pane showing its description, associated questions, and usage across assessments.',
-        'Drag-and-drop was considered for reordering skills but removed after usability testing showed it conflicted with the taxonomy\'s inherent structure. Instead, skills are positioned via a dedicated taxonomy editor available to admins.',
-        'Question preview cards show type, difficulty, and last-used date inline, reducing the need to open separate detail views.',
+        'Before: questions were stored as rows with inconsistent tags. Users had to search, filter, compare, and guess.',
+        'After: questions lived inside skill context with preview, ownership, and reuse signals. Users could explore a skill, understand what existed, and decide without leaving the workspace.',
+        'Example flow: An SME creating an SDE assessment can move from Programming to Data Structures to Arrays, review linked questions, compare difficulty, and reuse the right item inside the explorer.',
       ],
     },
     {
-      label: 'Constraints & Trade-offs',
+      label: 'Key product decisions',
       paragraphs: [
-        'The taxonomy depth was capped at four levels to balance expressiveness with navigability. Deeper hierarchies were supported via tagging, keeping the explorer focused.',
-        'Full-text search across questions was deprioritized in favor of skill-first navigation, a deliberate choice to reinforce the mental model shift.',
-        'The system was designed to be AI-ready from the start: each skill node carries structured metadata that downstream models can consume for auto-tagging and gap analysis.',
+        'Hierarchy over filters. Filters assume users know what to search for. Hierarchy helps users understand the domain before they act.',
+        'Preview over navigation. The preview pane gives enough context to evaluate a question without opening new pages.',
+        'Reuse as trust. Reuse is not solved with a button. Users reuse content only when they trust what they see.',
+        'Familiarity over novelty. I avoided custom graph views and dashboard-first layouts. They looked more impressive, but increased learning cost.',
+      ],
+    },
+    {
+      label: 'How I judged quality',
+      paragraphs: [
+        'Density balance: enough information to decide, not enough to overwhelm.',
+        'Clarity over completeness: anything that did not support finding, evaluating, creating, or reusing questions was removed or deferred.',
+        'Mental model integrity: if an interaction pushed users back into spreadsheet thinking, it did not belong.',
+      ],
+      image: {
+        src: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=800&fit=crop',
+        alt: 'Density comparison for the Question Library layout',
+        caption:
+          'The final layout sits between too much information and not enough context.',
+      },
+    },
+    {
+      label: 'Constraints',
+      paragraphs: [
+        'The Assessment Engine was mid-refactor, so the design had to work with existing systems instead of assuming a clean rebuild.',
+        'The timeline was aggressive. The work took eight weeks because the problem needed structural exploration, not just UI execution.',
+        'The system also had to support future AI workflows, so skills, relationships, and duplicates had to become easier to identify.',
+      ],
+    },
+    {
+      label: 'What I learned',
+      paragraphs: [
+        'I started by trying to improve screens. I ended by redesigning the mental model behind the screens.',
+        'Complex products do not become simple by hiding complexity. They become simple when the structure helps users make confident decisions.',
+        'Reuse, governance, and AI readiness are all connected by trust. If users cannot trust the structure, they recreate work. If the system cannot trust the structure, AI reasons poorly.',
+      ],
+    },
+    {
+      label: 'Credits',
+      paragraphs: [
+        'Product design: Nischal Skanda.',
+        'Stakeholders: CTO, Associate PM, Lead PM.',
+        'My contribution: problem reframing, UX architecture, explorer interaction model, design iterations, and stakeholder alignment.',
       ],
     },
   ],

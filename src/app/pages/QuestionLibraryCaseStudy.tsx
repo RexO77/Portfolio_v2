@@ -76,7 +76,11 @@ export default function QuestionLibraryCaseStudy() {
     <>
       <Navbar />
 
-      <main id="main-content" tabIndex={-1} className="case-study">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="case-study case-study--question-library"
+      >
       <section
         id={CASE_STUDY_SECTION_IDS.overview}
         className="case-study__section case-study__section--hero case-study__nav-target"
@@ -155,7 +159,10 @@ export default function QuestionLibraryCaseStudy() {
             <CaseStudyList items={caseStudy.problem.bullets} />
           </div>
 
-          <CaseStudyFigure image={caseStudy.problem.image} />
+          <CaseStudyFigure
+            image={caseStudy.problem.image}
+            className="case-study__figure"
+          />
         </motion.div>
       </section>
 
@@ -275,6 +282,12 @@ export default function QuestionLibraryCaseStudy() {
           {caseStudy.impact.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
+          {caseStudy.impact.image ? (
+            <CaseStudyFigure
+              image={caseStudy.impact.image}
+              className="case-study__figure"
+            />
+          ) : null}
         </motion.div>
       </section>
 
@@ -299,6 +312,9 @@ export default function QuestionLibraryCaseStudy() {
                 {paragraph}
               </p>
             ))}
+            {section.image ? (
+              <CaseStudyFigure image={section.image} className="case-study__figure" />
+            ) : null}
           </motion.div>
         </section>
       ))}

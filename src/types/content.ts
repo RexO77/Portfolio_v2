@@ -145,10 +145,12 @@ export interface CaseStudyContent {
     label: string
     display: string
     paragraphs: string[]
+    image?: CaseStudyImage
   }
   detailSections: Array<{
     label: string
     paragraphs: string[]
+    image?: CaseStudyImage
   }>
   cta: {
     heading: string
